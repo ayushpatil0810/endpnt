@@ -105,7 +105,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border border-border/80 p-6 sm:p-10 bg-card/10 relative mt-4 shadow-xl"
+          className="border border-border/80 p-4 sm:p-10 bg-card/10 relative mt-4 shadow-xl"
         >
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-border/40">
             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">

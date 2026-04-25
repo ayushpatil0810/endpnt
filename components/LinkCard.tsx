@@ -174,7 +174,7 @@ export function LinkCard({ link, onUpdate, onDelete }: LinkCardProps) {
 
         {/* Actions */}
         {!editing && (
-          <div className="flex items-center gap-4 opacity-0 lg:opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity duration-300 ml-auto mr-4">
+          <div className="flex items-center gap-2 sm:gap-4 opacity-100 lg:opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity duration-300 ml-auto mr-0 sm:mr-4 flex-col sm:flex-row">
             <button
               onClick={() => setEditing(true)}
               className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition-colors border border-border px-3 py-1.5 hover:bg-muted"

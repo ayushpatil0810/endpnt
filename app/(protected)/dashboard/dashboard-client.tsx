@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { User, Link as DbLink } from "@/db/schema/schema";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconSun, IconMoon } from "@tabler/icons-react";
+import { IconSun, IconMoon, IconExternalLink, IconLogout, IconShare } from "@tabler/icons-react";
 
 interface DashboardClientProps {
   user: User;
@@ -280,7 +280,7 @@ export function DashboardClient({
         <div className="font-bold text-sm tracking-widest text-foreground">
           endpnt.
         </div>
-        <div className="flex items-center gap-6 sm:gap-8">
+        <div className="flex items-center gap-4 sm:gap-8">
           {/* Sun / Moon toggle */}
           <button
             ref={toggleBtnRef}
@@ -316,31 +316,39 @@ export function DashboardClient({
           </button>
           <button
             onClick={() => setIsShareModalOpen(true)}
-            className="text-[10px] uppercase font-mono tracking-widest font-medium text-muted-foreground hover:text-foreground transition-colors bg-muted/20 px-4 py-2 rounded-full"
+            className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-widest font-semibold text-background bg-foreground hover:bg-foreground/90 transition-colors px-4 py-2 rounded-full"
+            aria-label="Share profile"
           >
-            Share
+            <IconShare size={14} />
+            <span className="hidden sm:inline">Share</span>
           </button>
+          
           <a
             href={`/${user.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-medium tracking-wide text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-foreground hover:bg-muted border border-border/50 hover:border-border transition-colors px-3 py-1.5 rounded-lg"
+            aria-label="View profile"
           >
-            View profile
+            <IconExternalLink size={16} />
+            <span className="hidden sm:inline">View profile</span>
           </a>
+          
           <button
             onClick={handleSignOut}
-            className="text-xs font-medium tracking-wide text-muted-foreground hover:text-destructive transition-colors"
+            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors px-3 py-1.5 rounded-lg"
+            aria-label="Sign out"
           >
-            Sign out
+            <IconLogout size={16} />
+            <span className="hidden sm:inline">Sign out</span>
           </button>
         </div>
       </nav>
 
-      <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 sm:px-12 py-16 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 sm:px-12 py-8 sm:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-24 items-start">
           {/* Left Column: Profile & Settings */}
-          <div className="lg:col-span-4 flex flex-col gap-16 sticky top-32">
+          <div className="lg:col-span-4 flex flex-col gap-10 lg:gap-16 relative lg:sticky lg:top-32">
             {/* Profile URL Banner - Extremely flat */}
             <motion.div
               initial={{ opacity: 0, x: -15 }}
