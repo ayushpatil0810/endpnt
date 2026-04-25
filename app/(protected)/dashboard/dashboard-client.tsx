@@ -139,14 +139,12 @@ export function DashboardClient({
       
       document.documentElement.animate(
         {
-          clipPath: isGoingLight ? [...clipPath].reverse() : clipPath,
+          clipPath: clipPath,
         },
         {
           duration: 600,
           easing: "cubic-bezier(0.4, 0, 0.2, 1)",
-          pseudoElement: isGoingLight
-            ? "::view-transition-old(root)"
-            : "::view-transition-new(root)",
+          pseudoElement: "::view-transition-new(root)",
         }
       );
     });
