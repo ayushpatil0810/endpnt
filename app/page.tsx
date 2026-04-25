@@ -5,7 +5,8 @@ import { IconBrandGithub, IconArrowRight, IconBolt, IconLink, IconChartBar, Icon
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { NoiseBackground } from "@/components/ui/noise-background";
-import { TextHoverEffect } from "@/components/ui/text-hover-effect";
+import DecryptedText from "@/components/ui/decrypted-text";
+import PixelSnow from "@/components/PixelSnow";
 
 const FEATURES = [
   {
@@ -48,19 +49,23 @@ export default function LandingPage() {
   return (
     <div className="flex-1 flex flex-col bg-black min-h-dvh overflow-x-hidden relative selection:bg-primary/20">
 
-      {/* ── Prismatic Aurora ── */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse 120% 80% at 70% 20%, rgba(255, 20, 147, 0.13), transparent 55%),
-            radial-gradient(ellipse 100% 60% at 30% 10%, rgba(0, 255, 255, 0.10), transparent 60%),
-            radial-gradient(ellipse 90% 70% at 50% 0%, rgba(138, 43, 226, 0.16), transparent 65%),
-            radial-gradient(ellipse 110% 50% at 80% 30%, rgba(255, 215, 0, 0.06), transparent 40%),
-            #000000
-          `,
-        }}
-      />
+      {/* ── Pixel Snow Background ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <PixelSnow
+          color="#ffffff"
+          flakeSize={0.01}
+          minFlakeSize={1.25}
+          pixelResolution={200}
+          speed={1.25}
+          density={0.3}
+          direction={125}
+          brightness={1}
+          depthFade={8}
+          farPlane={20}
+          gamma={0.4545}
+          variant="square"
+        />
+      </div>
 
       {/* ── Nav ── */}
       <motion.nav
@@ -108,13 +113,7 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               >
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 border border-white/10 rounded-full px-3 py-1 mb-6 backdrop-blur-sm bg-white/5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] uppercase tracking-widest font-mono text-white/60">
-                    Your dev profile, all in one endpoint
-                  </span>
-                </div>
+
 
                 <h1 className="text-[11vw] sm:text-[8vw] lg:text-[6.5rem] leading-[0.88] tracking-tighter font-medium text-white uppercase">
                   One URL.<br />
@@ -173,45 +172,45 @@ export default function LandingPage() {
               transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-5 flex justify-center lg:justify-end"
             >
-              <div className="w-full max-w-[320px] aspect-[1/1.35] border border-white/10 bg-white/5 p-6 flex flex-col justify-between relative overflow-hidden backdrop-blur-xl rounded-3xl shadow-[0_0_80px_rgba(138,43,226,0.15)]">
-                {/* Subtle inner glow */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/5 to-cyan-500/5 pointer-events-none" />
-
-                <div className="flex justify-between items-start relative z-10">
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-white/30">endpnt.dev/johndoe</div>
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <div className="w-full max-w-[340px] h-auto border border-white/10 bg-[#050505] p-8 flex flex-col relative overflow-hidden shadow-2xl">
+                {/* Header */}
+                <div className="flex justify-between items-start w-full">
+                  <div className="font-bold text-xs tracking-widest text-white uppercase">endpnt.</div>
+                  <div className="text-[9px] font-mono tracking-widest text-white/30 uppercase">endpnt.dev/johndoe</div>
                 </div>
 
-                <div className="flex flex-col gap-5 w-full mt-auto relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className="size-12 rounded-full bg-gradient-to-br from-purple-600/60 to-cyan-600/60 border border-white/10 flex items-center justify-center text-white font-serif italic text-xl shadow-lg">J</div>
+                <div className="flex flex-col gap-6 mt-10 w-full relative z-10">
+                  {/* Profile Header (matches dashboard aesthetic) */}
+                  <div className="flex flex-col gap-4">
+                    <div className="size-16 bg-white/5 border border-white/10 flex items-center justify-center text-2xl font-serif italic text-white/40">
+                      J
+                    </div>
                     <div className="flex flex-col">
-                      <div className="font-medium text-base tracking-tight text-white leading-tight">@johndoe</div>
-                      <div className="text-[11px] text-white/40 font-mono mt-0.5">Full-Stack Engineer</div>
+                      <div className="font-medium text-xl tracking-tight text-white uppercase">@JOHNDOE</div>
+                      <div className="text-xs text-white/60 font-mono mt-2 leading-relaxed normal-case">Full-Stack Engineer building things for the web.</div>
                     </div>
                   </div>
 
-                  <div className="w-full h-px bg-white/10" />
-
-                  <div className="flex flex-col gap-2.5 w-full">
-                    {["Portfolio", "GitHub", "Resume"].map((label, i) => (
+                  {/* Links (matches LinkCard aesthetic) */}
+                  <div className="flex flex-col w-full mt-2">
+                    {[
+                      { title: "Portfolio", url: "johndoe.dev", clicks: "1.2k" },
+                      { title: "GitHub", url: "github.com/johndoe", clicks: "843" },
+                      { title: "Resume", url: "read.cv/johndoe", clicks: "128" }
+                    ].map((link, i) => (
                       <div
                         key={i}
-                        className="h-12 w-full border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all flex items-center px-4 font-medium text-xs text-white/70 rounded-xl cursor-pointer"
+                        className="w-full border-b border-white/10 py-3.5 flex flex-col gap-1.5 group"
                         style={{ animationDelay: `${i * 100}ms` }}
                       >
-                        {label}
-                        <IconArrowRight size={14} className="ml-auto opacity-30" />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Mini stats row */}
-                  <div className="flex gap-3 pt-1">
-                    {[["1.2k", "views"], ["84", "clicks"], ["7.1%", "CTR"]].map(([val, label]) => (
-                      <div key={label} className="flex flex-col items-center flex-1 border border-white/8 rounded-xl py-2 bg-white/3">
-                        <span className="text-white font-semibold text-sm">{val}</span>
-                        <span className="text-white/30 font-mono text-[9px] uppercase tracking-wider">{label}</span>
+                        <div className="font-medium text-base tracking-tight text-white normal-case group-hover:text-white/70 transition-colors">
+                          {link.title}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <IconLink size={10} className="text-white/30" />
+                          <span className="text-[10px] font-mono text-white/40 normal-case">{link.url}</span>
+                          <span className="text-[10px] font-mono text-white/20 ml-auto">{link.clicks}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -221,15 +220,24 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Text Hover Effect "endpnt" ── */}
+        {/* ── Decrypted Text "endpnt" ── */}
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.2, delay: 0.8 }}
           className="w-full max-w-[1600px] mx-auto px-6 sm:px-16"
         >
-          <div className="h-40 sm:h-56 flex items-center justify-start overflow-hidden">
-            <TextHoverEffect text="endpnt" duration={0.4} />
+          <div className="h-40 sm:h-56 flex items-center justify-center overflow-hidden">
+            <DecryptedText
+              text="endpnt"
+              speed={60}
+              maxIterations={10}
+              characters="ABCD1234!?"
+              className="text-[15vw] sm:text-[12vw] lg:text-[14rem] leading-none tracking-tighter font-bold text-white uppercase"
+              encryptedClassName="text-[15vw] sm:text-[12vw] lg:text-[14rem] leading-none tracking-tighter font-bold text-white/20 uppercase"
+              parentClassName="all-letters"
+              animateOn="hover"
+            />
           </div>
         </motion.section>
 
