@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db/db";
 import { links } from "@/db/schema/schema";
 import { eq, and } from "drizzle-orm";
+import { isUrlSafe } from "@/lib/security";
 
 export async function PATCH(
   request: NextRequest,
@@ -17,7 +18,13 @@ export async function PATCH(
 
   const updateData: Record<string, unknown> = {};
   if (title !== undefined) updateData.title = title;
-  if (url !== undefined) updateData.url = url;
+  if (url !== undefined) {
+    const safe = await isUrlSafe(url);
+    if (!safe) {
+      return NextResponse.json({ error: "Unsafe or blocked URL" }, { status: 400 });
+    }
+    updateData.url = url;
+  }
   if (display_order !== undefined) updateData.displayOrder = display_order;
 
   const [updated] = await db

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db/db";
 import { links, users } from "@/db/schema/schema";
 import { eq, asc } from "drizzle-orm";
+import { isUrlSafe } from "@/lib/security";
 
 export async function GET(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -37,6 +38,11 @@ export async function POST(request: NextRequest) {
 
   if (!title || !url) {
     return NextResponse.json({ error: "Title and URL are required" }, { status: 400 });
+  }
+
+  const safe = await isUrlSafe(url);
+  if (!safe) {
+    return NextResponse.json({ error: "Unsafe or blocked URL" }, { status: 400 });
   }
 
   // Get current max display_order

@@ -17,7 +17,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "endpnt — One URL. Every link.",
+  title: "endpnt - One URL. Every link.",
   description:
     "endpnt gives developers a single, beautiful profile page for all their links, stats, and content. The dev-first Linktree alternative.",
 };

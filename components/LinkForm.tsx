@@ -87,13 +87,19 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
     <div className="w-full">
       {!open ? (
         <button
+          id="add-new-link-btn"
           onClick={() => setOpen(true)}
-          className="w-full flex items-center justify-center gap-3 py-6 border-y border-border/40 hover:border-foreground group transition-colors duration-300 bg-card/5 hover:bg-card/20"
+          className="w-full flex items-center justify-between px-6 py-6 border-y border-border/40 hover:border-foreground group transition-colors duration-300 bg-card/5 hover:bg-card/20"
         >
-          <IconPlus size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-          <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest">
-            Add new link
-          </span>
+          <div className="flex items-center gap-3">
+            <IconPlus size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+            <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest">
+              Add new link
+            </span>
+          </div>
+          <kbd className="hidden sm:inline-flex items-center gap-1 rounded bg-muted px-2 py-1 text-[10px] font-mono text-muted-foreground uppercase tracking-widest border border-border/50">
+            <span className="text-xs">⌘</span> K
+          </kbd>
         </button>
       ) : (
         <motion.div 

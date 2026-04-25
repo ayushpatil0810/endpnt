@@ -46,6 +46,10 @@ export function LinkCard({ link, onUpdate, onDelete }: LinkCardProps) {
           ? url
           : `https://${url}`;
 
+      const optimisticLink = { ...link, title: title.trim(), url: normalizedUrl };
+      onUpdate(optimisticLink);
+      setEditing(false);
+
       const res = await fetch(`/api/links/${link.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -55,9 +59,10 @@ export function LinkCard({ link, onUpdate, onDelete }: LinkCardProps) {
       if (!res.ok) throw new Error("Failed");
       const updated: Link = await res.json();
       onUpdate(updated);
-      setEditing(false);
       toast.success("Link updated!");
     } catch {
+      onUpdate(link);
+      setEditing(true);
       toast.error("Failed to update link.");
     } finally {
       setSaving(false);
@@ -72,13 +77,14 @@ export function LinkCard({ link, onUpdate, onDelete }: LinkCardProps) {
 
   async function handleDelete() {
     setDeleting(true);
+    onDelete(link.id);
     try {
       const res = await fetch(`/api/links/${link.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed");
-      onDelete(link.id);
       toast.success("Link deleted.");
     } catch {
-      toast.error("Failed to delete link.");
+      toast.error("Failed to delete link. Please refresh the page.");
+    } finally {
       setDeleting(false);
     }
   }
@@ -97,7 +103,7 @@ export function LinkCard({ link, onUpdate, onDelete }: LinkCardProps) {
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-foreground transition-colors touch-none py-2"
+          className="cursor-grab active:cursor-grabbing text-muted-foreground opacity-50 hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:outline-none transition-all touch-none py-2 rounded-md"
           aria-label="Reorder"
         >
           <IconGripVertical size={20} stroke={1.5} />
@@ -112,7 +118,7 @@ export function LinkCard({ link, onUpdate, onDelete }: LinkCardProps) {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Title"
-                className="bg-transparent border-b border-border focus:border-foreground py-2 text-lg font-medium tracking-tight text-foreground focus:outline-none transition-all placeholder:text-muted-foreground/30 rounded-none w-full normal-case"
+                className="bg-transparent border-b border-border focus:border-foreground py-2 text-lg font-medium tracking-tight text-foreground focus:outline-none transition-all placeholder:text-muted-foreground rounded-none w-full normal-case"
                 autoFocus
               />
               <input
@@ -120,7 +126,7 @@ export function LinkCard({ link, onUpdate, onDelete }: LinkCardProps) {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://..."
-                className="bg-transparent border-b border-border focus:border-foreground py-2 text-sm font-mono tracking-widest text-muted-foreground focus:outline-none transition-all placeholder:text-muted-foreground/30 rounded-none w-full normal-case"
+                className="bg-transparent border-b border-border focus:border-foreground py-2 text-sm font-mono tracking-widest text-muted-foreground focus:outline-none transition-all placeholder:text-muted-foreground rounded-none w-full normal-case"
               />
               <div className="flex items-center gap-4 mt-4">
                 <button

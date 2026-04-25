@@ -96,6 +96,17 @@ export function DashboardClient({
   const [isThemeReady, setIsThemeReady] = useState(false);
   const toggleBtnRef = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        document.getElementById("add-new-link-btn")?.click();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleThemeToggle = useCallback(() => {
     const btn = toggleBtnRef.current;
     const isGoingLight = dashboardTheme === "dark";
