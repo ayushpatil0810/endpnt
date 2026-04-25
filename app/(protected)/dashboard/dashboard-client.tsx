@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import "@theme-toggles/react/styles/expand.css";
+import { Expand } from "@theme-toggles/react";
+import { useState, useCallback, useEffect, type CSSProperties } from "react";
 import {
   DndContext,
   closestCenter,
@@ -34,24 +36,70 @@ interface DashboardClientProps {
   authUser: { name: string; image: string | null };
 }
 
-export function DashboardClient({ user, initialLinks, authUser }: DashboardClientProps) {
+type DashboardTheme = "dark" | "light";
+
+const DASHBOARD_THEME_STORAGE_KEY = "endpnt-dashboard-theme";
+
+const DASHBOARD_LIGHT_THEME_VARS = {
+  "--background": "oklch(0.985 0 0)",
+  "--foreground": "oklch(0.13 0 0)",
+  "--card": "oklch(1 0 0)",
+  "--card-foreground": "oklch(0.13 0 0)",
+  "--popover": "oklch(1 0 0)",
+  "--popover-foreground": "oklch(0.13 0 0)",
+  "--primary": "oklch(0.13 0 0)",
+  "--primary-foreground": "oklch(0.985 0 0)",
+  "--secondary": "oklch(0.96 0 0)",
+  "--secondary-foreground": "oklch(0.13 0 0)",
+  "--muted": "oklch(0.96 0 0)",
+  "--muted-foreground": "oklch(0.45 0 0)",
+  "--accent": "oklch(0.96 0 0)",
+  "--accent-foreground": "oklch(0.13 0 0)",
+  "--destructive": "oklch(0.58 0.24 27)",
+  "--destructive-foreground": "oklch(1 0 0)",
+  "--border": "oklch(0.9 0 0)",
+  "--input": "oklch(0.92 0 0)",
+  "--ring": "oklch(0.7 0 0)",
+  "--sidebar": "oklch(0.98 0 0)",
+  "--sidebar-foreground": "oklch(0.13 0 0)",
+  "--sidebar-primary": "oklch(0.13 0 0)",
+  "--sidebar-primary-foreground": "oklch(0.985 0 0)",
+  "--sidebar-accent": "oklch(0.96 0 0)",
+  "--sidebar-accent-foreground": "oklch(0.13 0 0)",
+  "--sidebar-border": "oklch(0.9 0 0)",
+  "--sidebar-ring": "oklch(0.7 0 0)",
+} as const;
+
+export function DashboardClient({
+  user,
+  initialLinks,
+  authUser,
+}: DashboardClientProps) {
   const router = useRouter();
   const [links, setLinks] = useState<DbLink[]>(initialLinks);
   const [bio, setBio] = useState(user.bio ?? "");
-  const [githubUsername, setGithubUsername] = useState(user.githubUsername ?? "");
-  const [leetcodeUsername, setLeetcodeUsername] = useState(user.leetcodeUsername ?? "");
+  const [githubUsername, setGithubUsername] = useState(
+    user.githubUsername ?? "",
+  );
+  const [leetcodeUsername, setLeetcodeUsername] = useState(
+    user.leetcodeUsername ?? "",
+  );
   const [devtoUsername, setDevtoUsername] = useState(user.devtoUsername ?? "");
   const [seoTitle, setSeoTitle] = useState(user.seoTitle ?? "");
-  const [seoDescription, setSeoDescription] = useState(user.seoDescription ?? "");
+  const [seoDescription, setSeoDescription] = useState(
+    user.seoDescription ?? "",
+  );
   const [avatarUrl] = useState(user.avatarUrl ?? authUser.image ?? null);
   const [background, setBackground] = useState(user.background ?? "aurora");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [dashboardTheme, setDashboardTheme] = useState<DashboardTheme>("dark");
+  const [isThemeReady, setIsThemeReady] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   function handleLinkAdded(newLink: DbLink) {
@@ -86,7 +134,10 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          updates: reordered.map((l) => ({ id: l.id, displayOrder: l.displayOrder })),
+          updates: reordered.map((l) => ({
+            id: l.id,
+            displayOrder: l.displayOrder,
+          })),
         }),
       });
       if (!res.ok) throw new Error("Sync failed");
@@ -100,11 +151,34 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
     router.push("/");
   }, [router]);
 
-  const [origin, setOrigin] = useState("https://endpoint.com");
+  const [origin, setOrigin] = useState("https://endpnt.dev");
 
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
+
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem(
+      DASHBOARD_THEME_STORAGE_KEY,
+    );
+    if (storedTheme === "light" || storedTheme === "dark") {
+      setDashboardTheme(storedTheme);
+    }
+    setIsThemeReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isThemeReady) return;
+    window.localStorage.setItem(DASHBOARD_THEME_STORAGE_KEY, dashboardTheme);
+  }, [dashboardTheme, isThemeReady]);
+
+  const dashboardThemeStyle: CSSProperties =
+    dashboardTheme === "light"
+      ? ({
+          ...DASHBOARD_LIGHT_THEME_VARS,
+          colorScheme: "light",
+        } as CSSProperties)
+      : ({ colorScheme: "dark" } as CSSProperties);
 
   const profileUrl = `${origin}/${user.username}`;
 
@@ -113,7 +187,11 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubUsername, leetcodeUsername, devtoUsername }),
+        body: JSON.stringify({
+          githubUsername,
+          leetcodeUsername,
+          devtoUsername,
+        }),
       });
       if (!res.ok) throw new Error("Failed to save profile");
       toast.success("Integrations updated!");
@@ -137,13 +215,25 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
   }, [seoTitle, seoDescription]);
 
   return (
-    <div className="min-h-dvh bg-background flex flex-col uppercase selection:bg-primary/20">
+    <div
+      data-dashboard-theme={dashboardTheme}
+      className={`min-h-dvh bg-background flex flex-col uppercase selection:bg-primary/20 ${dashboardTheme === "dark" ? "dark" : ""}`}
+      style={dashboardThemeStyle}
+    >
       {/* Top Nav */}
       <nav className="w-full border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-40 px-6 sm:px-12 py-4 flex items-center justify-between">
         <div className="font-bold text-sm tracking-widest text-foreground">
-          Endpoint.
+          endpnt.
         </div>
         <div className="flex items-center gap-6 sm:gap-8">
+          <Expand
+              duration={750}
+              onClick={() =>
+                setDashboardTheme(dashboardTheme === "dark" ? "light" : "dark")
+              }
+              className="text-foreground hover:text-muted-foreground transition-colors cursor-pointer bg-transparent border-none p-1.5 rounded-full hover:bg-muted/30"
+              style={{ fontSize: "1.3rem" }}
+            />
           <button
             onClick={() => setIsShareModalOpen(true)}
             className="text-[10px] uppercase font-mono tracking-widest font-medium text-muted-foreground hover:text-foreground transition-colors bg-muted/20 px-4 py-2 rounded-full"
@@ -168,20 +258,19 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
       </nav>
 
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 sm:px-12 py-16 sm:py-24">
-        
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
-          
           {/* Left Column: Profile & Settings */}
           <div className="lg:col-span-4 flex flex-col gap-16 sticky top-32">
-            
             {/* Profile URL Banner - Extremely flat */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               className="flex flex-col gap-4 border-b border-border/60 pb-8"
             >
-              <div className="text-[10px] font-mono tracking-widest text-muted-foreground text-left">YOUR ENDPOINT URL</div>
+              <div className="text-[10px] font-mono tracking-widest text-muted-foreground text-left">
+                YOUR ENDPNT URL
+              </div>
               <div className="flex items-end justify-between gap-4 flex-wrap">
                 <a
                   href={profileUrl}
@@ -204,7 +293,7 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
             </motion.div>
 
             {/* Profile header */}
-            <motion.section 
+            <motion.section
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -218,19 +307,24 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
             </motion.section>
 
             {/* Developer Integrations */}
-            <motion.section 
+            <motion.section
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
               className="flex flex-col gap-6"
             >
               <div className="flex items-center justify-between border-b border-border pb-4">
-                <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground">Dev Stats</span>
+                <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground">
+                  Dev Stats
+                </span>
               </div>
-              
+
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="github" className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">
+                  <label
+                    htmlFor="github"
+                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
+                  >
                     GitHub Username
                   </label>
                   <input
@@ -244,7 +338,10 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="leetcode" className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">
+                  <label
+                    htmlFor="leetcode"
+                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
+                  >
                     LeetCode Username
                   </label>
                   <input
@@ -259,7 +356,10 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
               </div>
 
               <div className="flex flex-col gap-2 mt-4">
-                <label htmlFor="devto" className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">
+                <label
+                  htmlFor="devto"
+                  className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
+                >
                   Dev.to Username (Blog)
                 </label>
                 <input
@@ -284,19 +384,24 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
             </motion.section>
 
             {/* Custom SEO Settings */}
-            <motion.section 
+            <motion.section
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.18 }}
               className="flex flex-col gap-6"
             >
               <div className="flex items-center justify-between border-b border-border pb-4">
-                <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground whitespace-nowrap">SEO & Social</span>
+                <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground whitespace-nowrap">
+                  SEO & Social
+                </span>
               </div>
-              
+
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="seoTitle" className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">
+                  <label
+                    htmlFor="seoTitle"
+                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
+                  >
                     Meta Title
                   </label>
                   <input
@@ -310,7 +415,10 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="seoDescription" className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">
+                  <label
+                    htmlFor="seoDescription"
+                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
+                  >
                     Meta Description
                   </label>
                   <textarea
@@ -335,12 +443,12 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
             </motion.section>
 
             {/* Background picker */}
-            <motion.section 
+            <motion.section
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <ThemePicker 
+              <ThemePicker
                 currentBackground={background}
                 onBackgroundChange={setBackground}
               />
@@ -349,7 +457,6 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
 
           {/* Right Column: Links Management & Analytics */}
           <div className="lg:col-span-8 flex flex-col gap-12 lg:gap-16">
-            
             {/* Analytics Dashboard */}
             <motion.section
               initial={{ opacity: 0, y: 15 }}
@@ -360,7 +467,7 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
             </motion.section>
 
             {/* Links Editor */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -370,7 +477,7 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
                 Your Links
               </h2>
               <div className="text-xs font-mono text-muted-foreground">
-                {links.length} {links.length === 1 ? 'link' : 'links'}
+                {links.length} {links.length === 1 ? "link" : "links"}
               </div>
             </motion.div>
 
@@ -398,7 +505,7 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
                         onDelete={handleLinkDeleted}
                       />
                     ))}
-                    
+
                     {links.length === 0 && (
                       <div className="py-16 text-center border-b border-border/40">
                         <p className="text-muted-foreground/60 text-sm font-medium tracking-wide normal-case">
@@ -418,7 +525,7 @@ export function DashboardClient({ user, initialLinks, authUser }: DashboardClien
         </div>
       </main>
 
-      <ShareModal 
+      <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         profileUrl={profileUrl}

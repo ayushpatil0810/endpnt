@@ -17,9 +17,9 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "LinkSnap — Your links. Your brand. One URL.",
+  title: "endpnt — One URL. Every link.",
   description:
-    "Create a beautiful bio link page with all your important links. The modern Linktree alternative.",
+    "endpnt gives developers a single, beautiful profile page for all their links, stats, and content. The dev-first Linktree alternative.",
 };
 
 export default function RootLayout({

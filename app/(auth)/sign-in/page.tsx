@@ -29,7 +29,7 @@ export default function SignInPage() {
           transition={{ duration: 0.8 }}
         >
           <Link href="/" className="font-bold text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors">
-            Endpoint.
+            endpnt.
           </Link>
         </motion.div>
 
@@ -43,7 +43,7 @@ export default function SignInPage() {
             Welcome Back
           </h1>
           <p className="text-muted-foreground text-sm font-mono tracking-widest uppercase">
-            Sign in to manage your Endpoint profile.
+            Sign in to manage your endpnt profile.
           </p>
         </motion.div>
 

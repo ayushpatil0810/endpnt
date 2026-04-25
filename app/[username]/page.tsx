@@ -4,6 +4,7 @@ import { eq, asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Suspense } from "react";
 import { PublicLinkButton } from "./public-link-button";
 import { GithubStats } from "@/components/github-stats";
@@ -203,9 +204,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       {/* Footer */}
       <footer className="mt-24 pt-12 pb-12 w-full flex flex-col items-center gap-4 text-[11px] font-mono tracking-widest text-muted-foreground uppercase relative z-10">
         <div className="w-12 h-px bg-border/40" />
-        <a href="/" className="hover:text-foreground font-bold transition-colors text-foreground/80 flex items-center gap-2">
+        <Link href="/" className="hover:text-foreground font-bold transition-colors text-foreground/80 flex items-center gap-2">
           Endpoint
-        </a>
+        </Link>
       </footer>
     </div>
   );
