@@ -1,8 +1,7 @@
 "use client";
 
-import "@theme-toggles/react/styles/expand.css";
-import { Expand } from "@theme-toggles/react";
-import { useState, useCallback, useEffect, type CSSProperties } from "react";
+import { useState, useCallback, useEffect, useRef, type CSSProperties } from "react";
+import { flushSync } from "react-dom";
 import {
   DndContext,
   closestCenter,
@@ -28,7 +27,8 @@ import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { User, Link as DbLink } from "@/db/schema/schema";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { IconSun, IconMoon } from "@tabler/icons-react";
 
 interface DashboardClientProps {
   user: User;
@@ -94,6 +94,52 @@ export function DashboardClient({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [dashboardTheme, setDashboardTheme] = useState<DashboardTheme>("dark");
   const [isThemeReady, setIsThemeReady] = useState(false);
+  const toggleBtnRef = useRef<HTMLButtonElement>(null);
+
+  const handleThemeToggle = useCallback(() => {
+    const btn = toggleBtnRef.current;
+    const isGoingLight = dashboardTheme === "dark";
+    const newTheme: DashboardTheme = isGoingLight ? "light" : "dark";
+
+    if (!document.startViewTransition) {
+      setDashboardTheme(newTheme);
+      return;
+    }
+
+    // Calculate origin and max radius
+    const x = btn ? btn.getBoundingClientRect().left + btn.offsetWidth / 2 : window.innerWidth / 2;
+    const y = btn ? btn.getBoundingClientRect().top + btn.offsetHeight / 2 : window.innerHeight / 2;
+    const maxRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    );
+
+    const transition = document.startViewTransition(() => {
+      flushSync(() => {
+        setDashboardTheme(newTheme);
+      });
+    });
+
+    transition.ready.then(() => {
+      const clipPath = [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${maxRadius}px at ${x}px ${y}px)`,
+      ];
+      
+      document.documentElement.animate(
+        {
+          clipPath: isGoingLight ? [...clipPath].reverse() : clipPath,
+        },
+        {
+          duration: 600,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          pseudoElement: isGoingLight
+            ? "::view-transition-old(root)"
+            : "::view-transition-new(root)",
+        }
+      );
+    });
+  }, [dashboardTheme]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -217,7 +263,7 @@ export function DashboardClient({
   return (
     <div
       data-dashboard-theme={dashboardTheme}
-      className={`min-h-dvh bg-background flex flex-col uppercase selection:bg-primary/20 ${dashboardTheme === "dark" ? "dark" : ""}`}
+      className="min-h-dvh bg-background flex flex-col uppercase selection:bg-primary/20"
       style={dashboardThemeStyle}
     >
       {/* Top Nav */}
@@ -226,14 +272,39 @@ export function DashboardClient({
           endpnt.
         </div>
         <div className="flex items-center gap-6 sm:gap-8">
-          <Expand
-              duration={750}
-              onClick={() =>
-                setDashboardTheme(dashboardTheme === "dark" ? "light" : "dark")
-              }
-              className="text-foreground hover:text-muted-foreground transition-colors cursor-pointer bg-transparent border-none p-1.5 rounded-full hover:bg-muted/30"
-              style={{ fontSize: "1.3rem" }}
-            />
+          {/* Sun / Moon toggle */}
+          <button
+            ref={toggleBtnRef}
+            aria-label="Toggle theme"
+            onClick={handleThemeToggle}
+            className="relative flex items-center justify-center size-9 rounded-full border border-border/50 bg-card/40 hover:bg-card/80 text-foreground transition-all duration-200 cursor-pointer overflow-hidden"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {dashboardTheme === "dark" ? (
+                <motion.span
+                  key="moon"
+                  initial={{ rotate: -30, opacity: 0, scale: 0.6 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 30, opacity: 0, scale: 0.6 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute flex items-center justify-center"
+                >
+                  <IconMoon size={15} stroke={1.5} />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="sun"
+                  initial={{ rotate: 30, opacity: 0, scale: 0.6 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: -30, opacity: 0, scale: 0.6 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute flex items-center justify-center"
+                >
+                  <IconSun size={15} stroke={1.5} />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
           <button
             onClick={() => setIsShareModalOpen(true)}
             className="text-[10px] uppercase font-mono tracking-widest font-medium text-muted-foreground hover:text-foreground transition-colors bg-muted/20 px-4 py-2 rounded-full"
