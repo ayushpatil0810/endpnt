@@ -23,16 +23,19 @@ import { LinkForm } from "@/components/LinkForm";
 import { ThemePicker } from "@/components/ThemePicker";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { ShareModal } from "@/components/ShareModal";
+import { ProjectCard } from "@/components/ProjectCard";
+import { ProjectForm } from "@/components/ProjectForm";
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { User, Link as DbLink } from "@/db/schema/schema";
+import type { User, Link as DbLink, Project } from "@/db/schema/schema";
 import { motion, AnimatePresence } from "framer-motion";
 import { IconSun, IconMoon, IconExternalLink, IconLogout, IconShare } from "@tabler/icons-react";
 
 interface DashboardClientProps {
   user: User;
   initialLinks: DbLink[];
+  initialProjects: Project[];
   authUser: { name: string; image: string | null };
 }
 
@@ -73,10 +76,12 @@ const DASHBOARD_LIGHT_THEME_VARS = {
 export function DashboardClient({
   user,
   initialLinks,
+  initialProjects,
   authUser,
 }: DashboardClientProps) {
   const router = useRouter();
   const [links, setLinks] = useState<DbLink[]>(initialLinks);
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [bio, setBio] = useState(user.bio ?? "");
   const [githubUsername, setGithubUsername] = useState(
     user.githubUsername ?? "",
@@ -200,6 +205,50 @@ export function DashboardClient({
       if (!res.ok) throw new Error("Sync failed");
     } catch {
       toast.error("Failed to save order.");
+    }
+  }
+
+  function handleProjectAdded(newProject: Project) {
+    setProjects((prev) => [...prev, newProject]);
+  }
+
+  function handleProjectUpdated(updated: Project) {
+    setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+  }
+
+  function handleProjectDeleted(id: string) {
+    setProjects((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  async function handleProjectDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = projects.findIndex((p) => p.id === active.id);
+    const newIndex = projects.findIndex((p) => p.id === over.id);
+
+    const reordered = arrayMove(projects, oldIndex, newIndex).map((p, idx) => ({
+      ...p,
+      displayOrder: idx,
+    }));
+
+    setProjects(reordered);
+
+    // Persist reorder
+    try {
+      const res = await fetch("/api/projects/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          updates: reordered.map((p) => ({
+            id: p.id,
+            displayOrder: p.displayOrder,
+          })),
+        }),
+      });
+      if (!res.ok) throw new Error("Sync failed");
+    } catch {
+      toast.error("Failed to save project order.");
     }
   }
 
@@ -580,6 +629,58 @@ export function DashboardClient({
                 currentBackground={background}
                 onBackgroundChange={setBackground}
               />
+            </motion.section>
+
+            {/* Featured Projects Section */}
+            <motion.section
+              initial={{ opacity: 0, x: -15 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.22 }}
+              className="flex flex-col gap-6"
+            >
+              <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium whitespace-nowrap">
+                  Featured Projects
+                </h2>
+                <div className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
+                  {projects.length} {projects.length === 1 ? "project" : "projects"}
+                </div>
+              </div>
+
+              <DndContext
+                id="projects-dnd-context"
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleProjectDragEnd}
+              >
+                <SortableContext
+                  items={projects.map((p) => p.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="flex flex-col">
+                    {projects.map((project) => (
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onUpdate={handleProjectUpdated}
+                        onDelete={handleProjectDeleted}
+                      />
+                    ))}
+
+                    {projects.length === 0 && (
+                      <div className="py-8 text-center border-b border-border/40">
+                        <p className="text-muted-foreground/60 text-sm font-medium tracking-wide normal-case">
+                          No featured projects yet.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </SortableContext>
+              </DndContext>
+
+              <div className="mt-2">
+                <ProjectForm onProjectAdded={handleProjectAdded} />
+              </div>
             </motion.section>
           </div>
 

@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { users, links } from "@/db/schema/schema";
+import { users, links, projects } from "@/db/schema/schema";
 import { eq, asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
@@ -12,7 +12,16 @@ import { LeetcodeStats } from "@/components/leetcode-stats";
 import { DevtoPosts } from "@/components/devto-posts";
 import { GithubCalendar } from "@/components/github-calendar";
 import { BlogPosts } from "@/components/blog-posts";
+import { FeaturedProjects } from "@/components/featured-projects";
 import { ViewTracker } from "@/components/ViewTracker";
+import {
+  GithubStatsSkeleton,
+  GithubCalendarSkeleton,
+  LeetcodeStatsSkeleton,
+  DevtoPostsSkeleton,
+  BlogPostsSkeleton,
+  FeaturedProjectsSkeleton,
+} from "@/components/profile-skeletons";
 
 interface ProfilePageProps {
   params: Promise<{ username: string }>;
@@ -69,6 +78,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     .from(links)
     .where(eq(links.userId, user.id))
     .orderBy(asc(links.displayOrder));
+
+  const userProjects = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.userId, user.id))
+    .orderBy(asc(projects.displayOrder));
 
   const bgOpt = user.background ?? "aurora";
 
@@ -160,19 +175,22 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
 
           {(user.githubUsername || user.leetcodeUsername) && (
-            <div className="w-full flex flex-col gap-4 mt-6">
+            <div className="w-full flex flex-col gap-4 mt-2">
+              <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase border-b border-border/40 pb-2">
+                Developer Stats
+              </h2>
               {user.githubUsername && (
                 <div className="flex flex-col gap-4">
-                  <Suspense fallback={<div className="h-32 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40" />}>
+                  <Suspense fallback={<GithubStatsSkeleton />}>
                     <GithubStats username={user.githubUsername} />
                   </Suspense>
-                  <Suspense fallback={<div className="h-40 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40" />}>
+                  <Suspense fallback={<GithubCalendarSkeleton />}>
                     <GithubCalendar username={user.githubUsername} />
                   </Suspense>
                 </div>
               )}
               {user.leetcodeUsername && (
-                <Suspense fallback={<div className="h-32 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40" />}>
+                <Suspense fallback={<LeetcodeStatsSkeleton />}>
                   <LeetcodeStats username={user.leetcodeUsername} />
                 </Suspense>
               )}
@@ -183,14 +201,20 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         {/* Links Section (Right on Desktop) */}
         <main className="flex-1 w-full flex flex-col gap-4">
           
+          {userProjects.length > 0 && (
+            <Suspense fallback={<FeaturedProjectsSkeleton />}>
+              <FeaturedProjects projects={userProjects} />
+            </Suspense>
+          )}
+
           {user.devtoUsername && (
-            <Suspense fallback={<div className="h-48 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40 mb-8" />}>
+            <Suspense fallback={<DevtoPostsSkeleton />}>
               <DevtoPosts username={user.devtoUsername} />
             </Suspense>
           )}
 
           {(user.mediumUsername || user.hashnodeUsername) && (
-            <Suspense fallback={<div className="h-48 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40 mb-8" />}>
+            <Suspense fallback={<BlogPostsSkeleton />}>
               <BlogPosts 
                 mediumUsername={user.mediumUsername ?? undefined} 
                 hashnodeUsername={user.hashnodeUsername ?? undefined} 

@@ -9,7 +9,12 @@ export async function GithubStats({ username }: { username: string }) {
     const data = await res.json();
 
     return (
-      <div className="w-full p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 group hover:border-foreground/30 transition-colors">
+      <a
+        href={`https://github.com/${data.login}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 group hover:border-foreground/30 transition-colors"
+      >
         <div className="flex items-center gap-3">
           <IconBrandGithub size={24} className="text-foreground" />
           <div className="flex flex-col">
@@ -31,7 +36,7 @@ export async function GithubStats({ username }: { username: string }) {
             <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Following</span>
           </div>
         </div>
-      </div>
+      </a>
     );
   } catch {
     return null;
