@@ -47,8 +47,8 @@ export function ThemePicker({ currentBackground, onBackgroundChange }: ThemePick
     <div className="flex flex-col gap-12">
       {/* Background Section */}
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between border-b border-border pb-4">
-          <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground">Background Style</span>
+        <div className="flex items-center justify-between border-b border-border/40 pb-4">
+          <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">Background Style</h2>
           {saving && (
             <span className="text-[10px] uppercase font-mono tracking-widest text-foreground animate-pulse">Syncing</span>
           )}

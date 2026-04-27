@@ -175,7 +175,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Title"
-                    className="bg-transparent border-b-2 border-border focus:border-foreground py-4 text-xl sm:text-2xl font-medium tracking-tight text-foreground transition-all placeholder:text-muted-foreground/30 rounded-none focus:outline-none w-full normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-4 text-xl sm:text-2xl font-medium tracking-tight text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case"
                     autoFocus
                     required
                   />
@@ -188,7 +188,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://"
-                    className="bg-transparent border-b-2 border-border focus:border-foreground py-4 text-sm sm:text-base font-mono tracking-wide text-foreground transition-all placeholder:text-muted-foreground/30 rounded-none focus:outline-none w-full normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-4 text-sm sm:text-base font-mono tracking-wide text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case"
                     required
                   />
                   {url === "mailto:" && (
@@ -200,7 +200,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                   <button
                     type="submit"
                     disabled={loading || !title.trim() || !url.trim()}
-                    className="bg-foreground text-background font-medium px-8 py-4 text-xs uppercase tracking-widest hover:bg-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
+                    className="bg-foreground text-background px-8 py-4 rounded-xl text-[10px] sm:text-xs uppercase tracking-widest font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
                   >
                     {loading ? <IconLoader2 size={16} className="animate-spin" /> : null}
                     {loading ? "Adding..." : "Add link"}
@@ -208,7 +208,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                   <button
                     type="button"
                     onClick={() => setStep("presets")}
-                    className="px-8 py-4 text-xs uppercase tracking-widest text-foreground hover:bg-muted transition-colors border border-border w-full sm:w-auto"
+                    className="px-8 py-4 rounded-xl text-[10px] sm:text-xs uppercase tracking-widest text-foreground hover:bg-muted transition-colors border border-border w-full sm:w-auto"
                   >
                     Back to Options
                   </button>

@@ -354,11 +354,11 @@ export function DashboardClient({
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="flex flex-col gap-4 border-b border-border/60 pb-8"
+              className="flex flex-col gap-4 border-b border-border/40 pb-8"
             >
-              <div className="text-[10px] font-mono tracking-widest text-muted-foreground text-left">
-                YOUR ENDPNT URL
-              </div>
+              <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium text-left">
+                Your Endpnt URL
+              </h2>
               <div className="flex items-end justify-between gap-4 flex-wrap">
                 <a
                   href={profileUrl}
@@ -401,10 +401,10 @@ export function DashboardClient({
               transition={{ duration: 0.6, delay: 0.15 }}
               className="flex flex-col gap-6"
             >
-              <div className="flex items-center justify-between border-b border-border pb-4">
-                <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground">
+              <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">
                   Dev Stats
-                </span>
+                </h2>
               </div>
 
               <div className="flex flex-col gap-4">
@@ -464,7 +464,7 @@ export function DashboardClient({
                 <button
                   type="button"
                   onClick={handleIntegrationSave}
-                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl font-medium text-xs tracking-wide transition-colors"
+                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-medium transition-colors"
                 >
                   Save Config
                 </button>
@@ -478,10 +478,10 @@ export function DashboardClient({
               transition={{ duration: 0.6, delay: 0.18 }}
               className="flex flex-col gap-6"
             >
-              <div className="flex items-center justify-between border-b border-border pb-4">
-                <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground whitespace-nowrap">
+              <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium whitespace-nowrap">
                   SEO & Social
-                </span>
+                </h2>
               </div>
 
               <div className="flex flex-col gap-4">
@@ -523,7 +523,7 @@ export function DashboardClient({
                 <button
                   type="button"
                   onClick={handleSeoSave}
-                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl font-medium text-xs tracking-wide transition-colors"
+                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-medium transition-colors"
                 >
                   Save SEO
                 </button>
@@ -559,12 +559,12 @@ export function DashboardClient({
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex items-center justify-between border-b border-border/60 pb-6"
+              className="flex items-center justify-between border-b border-border/40 pb-4 mb-2"
             >
-              <h2 className="text-sm font-medium uppercase tracking-widest text-foreground">
+              <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">
                 Your Links
               </h2>
-              <div className="text-xs font-mono text-muted-foreground">
+              <div className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
                 {links.length} {links.length === 1 ? "link" : "links"}
               </div>
             </motion.div>

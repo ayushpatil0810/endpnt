@@ -59,9 +59,9 @@ export function AnalyticsDashboard({ views, links }: AnalyticsDashboardProps) {
       {topLinks.length > 0 && totalClicks > 0 && (
         <div className="flex flex-col gap-6 p-6 sm:p-8 rounded-3xl bg-card border border-border/70 shadow-sm ring-1 ring-white/[0.04] dark:ring-white/[0.06]">
           <div className="flex items-center justify-between border-b border-border/40 pb-4">
-            <h3 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">
+            <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">
               Top Performing Links
-            </h3>
+            </h2>
           </div>
           <div className="flex flex-col gap-6">
             {topLinks.filter(l => l.clicks > 0).map((link, idx) => {
