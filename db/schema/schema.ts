@@ -4,6 +4,7 @@ import {
   timestamp,
   integer,
   uuid,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -38,3 +39,20 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Link = typeof links.$inferSelect;
 export type NewLink = typeof links.$inferInsert;
+
+export const projects = pgTable("projects", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  liveUrl: text("live_url"),
+  githubUrl: text("github_url"),
+  techStack: jsonb("tech_stack").$type<string[]>(),
+  displayOrder: integer("display_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
