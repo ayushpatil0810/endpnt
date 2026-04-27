@@ -85,6 +85,8 @@ export function DashboardClient({
     user.leetcodeUsername ?? "",
   );
   const [devtoUsername, setDevtoUsername] = useState(user.devtoUsername ?? "");
+  const [mediumUsername, setMediumUsername] = useState(user.mediumUsername ?? "");
+  const [hashnodeUsername, setHashnodeUsername] = useState(user.hashnodeUsername ?? "");
   const [seoTitle, setSeoTitle] = useState(user.seoTitle ?? "");
   const [seoDescription, setSeoDescription] = useState(
     user.seoDescription ?? "",
@@ -246,6 +248,8 @@ export function DashboardClient({
           githubUsername,
           leetcodeUsername,
           devtoUsername,
+          mediumUsername,
+          hashnodeUsername,
         }),
       });
       if (!res.ok) throw new Error("Failed to save profile");
@@ -253,7 +257,7 @@ export function DashboardClient({
     } catch {
       toast.error("Failed to update integrations");
     }
-  }, [githubUsername, leetcodeUsername, devtoUsername]);
+  }, [githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername]);
 
   const handleSeoSave = useCallback(async () => {
     try {
@@ -458,6 +462,42 @@ export function DashboardClient({
                   placeholder="e.g. ben"
                   className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                 />
+              </div>
+
+              <div className="flex flex-col gap-4 mt-4 sm:flex-row">
+                <div className="flex-1 flex flex-col gap-2">
+                  <label
+                    htmlFor="medium"
+                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
+                  >
+                    Medium Username
+                  </label>
+                  <input
+                    id="medium"
+                    type="text"
+                    value={mediumUsername}
+                    onChange={(e) => setMediumUsername(e.target.value)}
+                    placeholder="e.g. jdoe"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                  />
+                </div>
+
+                <div className="flex-1 flex flex-col gap-2">
+                  <label
+                    htmlFor="hashnode"
+                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
+                  >
+                    Hashnode Username
+                  </label>
+                  <input
+                    id="hashnode"
+                    type="text"
+                    value={hashnodeUsername}
+                    onChange={(e) => setHashnodeUsername(e.target.value)}
+                    placeholder="e.g. jdoe"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end pt-2">

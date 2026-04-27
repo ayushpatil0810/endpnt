@@ -1,10 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { GitHubCalendar } from "react-github-calendar";
 import { useTheme } from "next-themes";
 
 export function GithubCalendar({ username }: { username: string }) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-full p-5 sm:p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md hover:border-foreground/30 transition-colors overflow-x-auto min-h-[160px] flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center gap-4 w-full">
+          <div className="h-4 w-32 bg-foreground/10 rounded-full self-start mb-2" />
+          <div className="h-24 w-full bg-foreground/5 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full p-5 sm:p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md hover:border-foreground/30 transition-colors overflow-x-auto">

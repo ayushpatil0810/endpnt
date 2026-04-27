@@ -24,7 +24,7 @@ export async function PATCH(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { bio, theme, background, githubUsername, leetcodeUsername, devtoUsername, seoTitle, seoDescription } = body;
+  const { bio, theme, background, githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername, seoTitle, seoDescription } = body;
 
   const updateData: Record<string, unknown> = {};
   if (bio !== undefined) updateData.bio = bio;
@@ -33,6 +33,8 @@ export async function PATCH(request: NextRequest) {
   if (githubUsername !== undefined) updateData.githubUsername = githubUsername === "" ? null : githubUsername;
   if (leetcodeUsername !== undefined) updateData.leetcodeUsername = leetcodeUsername === "" ? null : leetcodeUsername;
   if (devtoUsername !== undefined) updateData.devtoUsername = devtoUsername === "" ? null : devtoUsername;
+  if (mediumUsername !== undefined) updateData.mediumUsername = mediumUsername === "" ? null : mediumUsername;
+  if (hashnodeUsername !== undefined) updateData.hashnodeUsername = hashnodeUsername === "" ? null : hashnodeUsername;
   if (seoTitle !== undefined) updateData.seoTitle = seoTitle === "" ? null : seoTitle;
   if (seoDescription !== undefined) updateData.seoDescription = seoDescription === "" ? null : seoDescription;
 

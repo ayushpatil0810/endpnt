@@ -10,6 +10,8 @@ import { PublicLinkButton } from "./public-link-button";
 import { GithubStats } from "@/components/github-stats";
 import { LeetcodeStats } from "@/components/leetcode-stats";
 import { DevtoPosts } from "@/components/devto-posts";
+import { GithubCalendar } from "@/components/github-calendar";
+import { BlogPosts } from "@/components/blog-posts";
 import { ViewTracker } from "@/components/ViewTracker";
 
 interface ProfilePageProps {
@@ -160,9 +162,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           {(user.githubUsername || user.leetcodeUsername) && (
             <div className="w-full flex flex-col gap-4 mt-6">
               {user.githubUsername && (
-                <Suspense fallback={<div className="h-32 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40" />}>
-                  <GithubStats username={user.githubUsername} />
-                </Suspense>
+                <div className="flex flex-col gap-4">
+                  <Suspense fallback={<div className="h-32 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40" />}>
+                    <GithubStats username={user.githubUsername} />
+                  </Suspense>
+                  <Suspense fallback={<div className="h-40 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40" />}>
+                    <GithubCalendar username={user.githubUsername} />
+                  </Suspense>
+                </div>
               )}
               {user.leetcodeUsername && (
                 <Suspense fallback={<div className="h-32 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40" />}>
@@ -179,6 +186,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           {user.devtoUsername && (
             <Suspense fallback={<div className="h-48 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40 mb-8" />}>
               <DevtoPosts username={user.devtoUsername} />
+            </Suspense>
+          )}
+
+          {(user.mediumUsername || user.hashnodeUsername) && (
+            <Suspense fallback={<div className="h-48 w-full animate-pulse bg-card/10 rounded-2xl border border-border/40 mb-8" />}>
+              <BlogPosts 
+                mediumUsername={user.mediumUsername ?? undefined} 
+                hashnodeUsername={user.hashnodeUsername ?? undefined} 
+              />
             </Suspense>
           )}
 
