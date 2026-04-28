@@ -29,7 +29,9 @@ interface ProfilePageProps {
 
 export const revalidate = 60; // Cache page for 60 seconds (ISR) to prevent DB overload if a profile goes viral
 
-export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ProfilePageProps): Promise<Metadata> {
   const { username } = await params;
 
   const [user] = await db
@@ -40,24 +42,35 @@ export async function generateMetadata({ params }: ProfilePageProps): Promise<Me
 
   if (!user) return { title: "Not Found" };
 
+  const title = user.seoTitle || `@${user.username} | Endpoint`;
+  const description =
+    user.seoDescription ||
+    user.bio ||
+    `Check out ${user.username}'s links on Endpoint`;
+  const ogImageUrl = `/api/og?username=${user.username}`;
+
   return {
-    title: user.seoTitle || `@${user.username} | Endpoint`,
-    description: user.seoDescription || user.bio || `Check out ${user.username}'s links on Endpoint`,
+    title,
+    description,
     openGraph: {
-      title: user.seoTitle || `@${user.username} | Endpoint`,
-      description: user.seoDescription || user.bio || `Check out ${user.username}'s links on Endpoint`,
+      title,
+      description,
+      type: "profile",
+      url: `https://endpnt.dev/${user.username}`,
       images: [
         {
-          url: `/api/og?username=${user.username}`,
+          url: ogImageUrl,
           width: 1200,
           height: 630,
+          alt: title,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `@${user.username} | Endpoint`,
-      images: [`/api/og?username=${user.username}`],
+      title,
+      description,
+      images: [ogImageUrl],
     },
   };
 }
@@ -98,35 +111,39 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   }
 
   return (
-    <div 
-      className="min-h-dvh text-foreground flex flex-col items-center px-6 py-24 sm:py-32 w-full selection:bg-foreground selection:text-background relative overflow-hidden" 
+    <div
+      className="min-h-dvh text-foreground flex flex-col items-center px-6 py-24 sm:py-32 w-full selection:bg-foreground selection:text-background relative overflow-hidden"
       style={{
-        backgroundColor: Object.keys(customBgStyle).length === 0 ? "var(--background)" : undefined,
-        ...customBgStyle
+        backgroundColor:
+          Object.keys(customBgStyle).length === 0
+            ? "var(--background)"
+            : undefined,
+        ...customBgStyle,
       }}
     >
       <ViewTracker username={user.username} />
-      
+
       {bgOpt === "aurora" && (
         <div
           className="aurora-bg absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen"
-        style={{
-          background: `
+          style={{
+            background: `
             radial-gradient(ellipse 100% 80% at 50% -20%, rgba(138, 43, 226, 0.15), transparent 50%),
             radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0, 255, 255, 0.1), transparent 60%),
             radial-gradient(ellipse 90% 60% at 80% 0%, rgba(255, 215, 0, 0.05), transparent 65%),
             #00000000
           `,
-        }}
-      />
+          }}
+        />
       )}
 
       {bgOpt === "grid" && (
         <div
           className="absolute inset-0 z-0 pointer-events-none opacity-10"
           style={{
-            backgroundImage: 'linear-gradient(to right, var(--foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)',
-            backgroundSize: '2rem 2rem'
+            backgroundImage:
+              "linear-gradient(to right, var(--foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)",
+            backgroundSize: "2rem 2rem",
           }}
         />
       )}
@@ -135,14 +152,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <div
           className="absolute inset-0 z-0 pointer-events-none opacity-20"
           style={{
-            backgroundImage: 'radial-gradient(var(--foreground) 1px, transparent 1px)',
-            backgroundSize: '1.5rem 1.5rem'
+            backgroundImage:
+              "radial-gradient(var(--foreground) 1px, transparent 1px)",
+            backgroundSize: "1.5rem 1.5rem",
           }}
         />
       )}
 
       <div className="max-w-7xl w-full mx-auto flex flex-col lg:flex-row items-center lg:items-start gap-16 lg:gap-24 relative z-10 px-4 sm:px-8">
-        
         {/* Header Section (Left on Desktop) */}
         <header className="flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:sticky lg:top-32 lg:w-[350px] shrink-0 w-full">
           <div className="size-28 sm:size-32 rounded-full overflow-hidden border border-border/30 ring-4 ring-background/50 shadow-2xl bg-card/20 backdrop-blur-sm">
@@ -161,12 +178,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </div>
             )}
           </div>
-          
+
           <div className="flex flex-col gap-3">
             <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground uppercase">
               @{user.username}
             </h1>
-            
+
             {user.bio && (
               <p className="text-sm sm:text-base text-muted-foreground/90 leading-relaxed max-w-sm lg:max-w-full mx-auto lg:mx-0 font-mono tracking-wide px-4 lg:px-0">
                 {user.bio}
@@ -200,7 +217,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
         {/* Links Section (Right on Desktop) */}
         <main className="flex-1 w-full flex flex-col gap-4">
-          
           {userProjects.length > 0 && (
             <Suspense fallback={<FeaturedProjectsSkeleton />}>
               <FeaturedProjects projects={userProjects} />
@@ -215,9 +231,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
           {(user.mediumUsername || user.hashnodeUsername) && (
             <Suspense fallback={<BlogPostsSkeleton />}>
-              <BlogPosts 
-                mediumUsername={user.mediumUsername ?? undefined} 
-                hashnodeUsername={user.hashnodeUsername ?? undefined} 
+              <BlogPosts
+                mediumUsername={user.mediumUsername ?? undefined}
+                hashnodeUsername={user.hashnodeUsername ?? undefined}
               />
             </Suspense>
           )}
@@ -244,7 +260,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       {/* Footer */}
       <footer className="mt-24 pt-12 pb-12 w-full flex flex-col items-center gap-4 text-[11px] font-mono tracking-widest text-muted-foreground uppercase relative z-10">
         <div className="w-12 h-px bg-border/40" />
-        <Link href="/" className="hover:text-foreground font-bold transition-colors text-foreground/80 flex items-center gap-2">
+        <Link
+          href="/"
+          className="hover:text-foreground font-bold transition-colors text-foreground/80 flex items-center gap-2"
+        >
           Endpoint
         </Link>
       </footer>
