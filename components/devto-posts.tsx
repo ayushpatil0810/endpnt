@@ -1,4 +1,9 @@
-import { IconHeart, IconMessageCircle, IconClock, IconArrowUpRight } from "@tabler/icons-react";
+import {
+  IconHeart,
+  IconMessageCircle,
+  IconClock,
+  IconArrowUpRight,
+} from "@tabler/icons-react";
 
 interface DevToArticle {
   id: number;
@@ -30,7 +35,7 @@ export async function DevtoPosts({ username }: { username: string }) {
   try {
     const res = await fetch(
       `https://dev.to/api/articles?username=${username}&per_page=3`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600 } },
     );
 
     if (!res.ok) return null;
@@ -42,102 +47,111 @@ export async function DevtoPosts({ username }: { username: string }) {
 
   return (
     <section className="flex flex-col gap-4 w-full mb-8">
-        <div className="flex items-center justify-between gap-3 border-b border-border/40 pb-2">
-          <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
-            Dev Publications
-          </h2>
-          <div
-            className="flex items-center gap-1.5 text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-full"
-            style={{ color: DEVTO_COLOR, background: DEVTO_BG }}
+      <div className="flex items-center justify-between gap-3 border-b border-border/40 pb-2">
+        <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
+          Dev Publications
+        </h2>
+        <div
+          className="flex items-center gap-1.5 text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-full"
+          style={{ color: DEVTO_COLOR, background: DEVTO_BG }}
+        >
+          <DevToIcon />
+          Dev.to
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3">
+        {articles.map((article) => (
+          <a
+            key={article.id}
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={
+              {
+                background: DEVTO_BG,
+                borderColor: DEVTO_BORDER,
+                "--hb": DEVTO_HOVER_BORDER,
+              } as React.CSSProperties
+            }
+            className="group relative flex flex-col gap-3 p-5 rounded-none border transition-all duration-300 backdrop-blur-md overflow-hidden hover:border-[var(--hb)] hover:-translate-y-0.5 hover:shadow-lg"
           >
-            <DevToIcon />
-            Dev.to
-          </div>
-        </div>
+            {/* Ambient glow */}
+            <div
+              className="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity duration-500"
+              style={{ background: DEVTO_COLOR }}
+            />
 
-        <div className="grid grid-cols-1 gap-3">
-          {articles.map((article) => (
-            <a
-              key={article.id}
-              href={article.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={
-                {
-                  background: DEVTO_BG,
-                  borderColor: DEVTO_BORDER,
-                  "--hb": DEVTO_HOVER_BORDER,
-                } as React.CSSProperties
-              }
-              className="group relative flex flex-col gap-3 p-5 rounded-none border transition-all duration-300 backdrop-blur-md overflow-hidden hover:border-[var(--hb)] hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              {/* Ambient glow */}
+            {/* Badge + arrow */}
+            <div className="flex items-center justify-between z-10">
               <div
-                className="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity duration-500"
-                style={{ background: DEVTO_COLOR }}
+                className="flex items-center gap-1.5 text-[10px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-full"
+                style={{ color: DEVTO_COLOR, background: `${DEVTO_COLOR}18` }}
+              >
+                <DevToIcon />
+                Dev.to
+              </div>
+              <IconArrowUpRight
+                size={15}
+                className="opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                style={{ color: DEVTO_COLOR }}
               />
+            </div>
 
-              {/* Badge + arrow */}
-              <div className="flex items-center justify-between z-10">
-                <div
-                  className="flex items-center gap-1.5 text-[10px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-full"
-                  style={{ color: DEVTO_COLOR, background: `${DEVTO_COLOR}18` }}
-                >
-                  <DevToIcon />
-                  Dev.to
-                </div>
-                <IconArrowUpRight
-                  size={15}
-                  className="opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                  style={{ color: DEVTO_COLOR }}
-                />
-              </div>
-
-              {/* Title & description */}
-              <div className="flex flex-col gap-1.5 z-10">
-                <h3 className="text-sm font-semibold leading-snug line-clamp-2 text-foreground/90 group-hover:text-foreground transition-colors">
-                  {article.title}
-                </h3>
-                {article.description && (
-                  <p className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed">
-                    {article.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Tags */}
-              {article.tag_list && article.tag_list.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 z-10">
-                  {article.tag_list.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[9px] font-mono px-2 py-0.5 rounded-full uppercase tracking-wider"
-                      style={{ color: DEVTO_COLOR, background: `${DEVTO_COLOR}14` }}
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
+            {/* Title & description */}
+            <div className="flex flex-col gap-1.5 z-10">
+              <h3 className="text-sm font-semibold leading-snug line-clamp-2 text-foreground/90 group-hover:text-foreground transition-colors">
+                {article.title}
+              </h3>
+              {article.description && (
+                <p className="text-xs text-muted-foreground/70 line-clamp-2 leading-relaxed">
+                  {article.description}
+                </p>
               )}
+            </div>
 
-              {/* Stats */}
-              <div className="flex items-center gap-4 text-[10px] font-mono text-muted-foreground/50 mt-auto z-10 pt-2 border-t border-border/20">
-                <span className="flex items-center gap-1.5">
-                  <IconHeart size={11} className="group-hover:text-rose-400 transition-colors" />
-                  {article.public_reactions_count}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <IconMessageCircle size={11} className="group-hover:text-sky-400 transition-colors" />
-                  {article.comments_count}
-                </span>
-                <span className="flex items-center gap-1.5 ml-auto">
-                  <IconClock size={11} />
-                  {article.reading_time_minutes} min read
-                </span>
+            {/* Tags */}
+            {article.tag_list && article.tag_list.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 z-10">
+                {article.tag_list.slice(0, 3).map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-[9px] font-mono px-2 py-0.5 rounded-full uppercase tracking-wider"
+                    style={{
+                      color: DEVTO_COLOR,
+                      background: `${DEVTO_COLOR}14`,
+                    }}
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
-            </a>
-          ))}
-        </div>
-      </section>
-    );
+            )}
+
+            {/* Stats */}
+            <div className="flex items-center gap-4 text-[10px] font-mono text-muted-foreground/50 mt-auto z-10 pt-2 border-t border-border/20">
+              <span className="flex items-center gap-1.5">
+                <IconHeart
+                  size={11}
+                  className="group-hover:text-rose-400 transition-colors"
+                />
+                {article.public_reactions_count}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <IconMessageCircle
+                  size={11}
+                  className="group-hover:text-sky-400 transition-colors"
+                />
+                {article.comments_count}
+              </span>
+              <span className="flex items-center gap-1.5 ml-auto">
+                <IconClock size={11} />
+                {article.reading_time_minutes} min read
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
 }
