@@ -10,7 +10,7 @@ interface ProjectFormProps {
 }
 
 const INPUT_CLASS =
-  "w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case";
+  "w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case";
 
 export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
   const [open, setOpen] = useState(false);
@@ -70,7 +70,7 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
       <button
         id="add-new-project-btn"
         onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-center gap-2 py-4 border border-dashed border-border/50 hover:border-foreground/40 rounded-xl text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition-all"
+        className="w-full flex items-center justify-center gap-2 py-4 border border-dashed border-border/50 hover:border-foreground/40 rounded-none text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition-all"
       >
         <IconPlus size={14} />
         Add Project
@@ -81,7 +81,7 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 p-5 border border-border/50 rounded-2xl bg-card/10 backdrop-blur-sm"
+      className="flex flex-col gap-3 p-5 border border-border/50 rounded-none bg-card/10 backdrop-blur-sm"
     >
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground">
@@ -143,7 +143,7 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
         <button
           type="submit"
           disabled={saving || !title.trim()}
-          className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
         >
           {saving ? <IconLoader2 size={12} className="animate-spin" /> : <IconPlus size={12} />}
           Add Project
@@ -151,7 +151,7 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
         <button
           type="button"
           onClick={reset}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-transparent hover:border-border"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-transparent hover:border-border"
         >
           <IconX size={12} /> Cancel
         </button>

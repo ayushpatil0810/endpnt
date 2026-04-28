@@ -49,7 +49,7 @@ function BlogCard({ post, config }: { post: BlogPost; config: PlatformConfig }) 
           "--hb": config.hoverBorder,
         } as React.CSSProperties
       }
-      className="group relative flex flex-col gap-3 p-5 rounded-2xl border transition-all duration-300 backdrop-blur-md overflow-hidden hover:border-[var(--hb)] hover:-translate-y-0.5 hover:shadow-lg"
+      className="group relative flex flex-col gap-3 p-5 rounded-none border transition-all duration-300 backdrop-blur-md overflow-hidden hover:border-[var(--hb)] hover:-translate-y-0.5 hover:shadow-lg"
     >
       {/* Ambient glow blob */}
       <div

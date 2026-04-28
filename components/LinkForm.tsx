@@ -54,7 +54,10 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
 
     // Auto-prepend https if missing (unless it's mailto: or similar)
     const normalizedUrl =
-      url.startsWith("http://") || url.startsWith("https://") || url.startsWith("mailto:") || url.startsWith("tel:")
+      url.startsWith("http://") ||
+      url.startsWith("https://") ||
+      url.startsWith("mailto:") ||
+      url.startsWith("tel:")
         ? url
         : `https://${url}`;
 
@@ -92,7 +95,10 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
           className="w-full flex items-center justify-between px-6 py-6 border-y border-border/40 hover:border-foreground group transition-colors duration-300 bg-card/5 hover:bg-card/20"
         >
           <div className="flex items-center gap-3">
-            <IconPlus size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+            <IconPlus
+              size={18}
+              className="text-muted-foreground group-hover:text-foreground transition-colors"
+            />
             <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest">
               Add new link
             </span>
@@ -102,7 +108,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
           </kbd>
         </button>
       ) : (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="border border-border/80 p-4 sm:p-10 bg-card/10 relative mt-4 shadow-xl"
@@ -121,7 +127,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
 
           <AnimatePresence mode="wait">
             {step === "presets" ? (
-              <motion.div 
+              <motion.div
                 key="presets"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -133,10 +139,14 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                     <button
                       key={preset.title}
                       onClick={() => handlePresetClick(preset)}
-                      className="flex items-center gap-3 p-4 border border-border/50 hover:border-foreground hover:bg-foreground hover:text-background transition-all rounded-lg group text-left"
+                      className="flex items-center gap-3 p-4 border border-border/50 hover:border-foreground hover:bg-foreground hover:text-background transition-all rounded-none group text-left"
                     >
-                      <LinkIcon title={preset.title} url={preset.url} className="text-muted-foreground group-hover:text-background transition-colors" />
-                      <span className="text-xs font-semibold tracking-wide uppercase">
+                      <LinkIcon
+                        title={preset.title}
+                        url={preset.url}
+                        className="text-muted-foreground group-hover:text-background transition-colors"
+                      />
+                      <span className="text-xs font-semibold tracking-wide uppercase text-foreground group-hover:text-background transition-colors">
                         {preset.title}
                       </span>
                     </button>
@@ -145,13 +155,15 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
 
                 <div className="w-full flex items-center gap-4">
                   <div className="h-px bg-border/40 flex-1" />
-                  <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">OR</span>
+                  <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
+                    OR
+                  </span>
                   <div className="h-px bg-border/40 flex-1" />
                 </div>
 
                 <button
                   onClick={() => handlePresetClick()}
-                  className="flex items-center justify-center gap-3 p-4 border border-border/50 hover:border-foreground bg-card/5 hover:bg-card/20 transition-all rounded-lg text-center w-full"
+                  className="flex items-center justify-center gap-3 p-4 border border-border/50 hover:border-foreground bg-card/5 hover:bg-card/20 transition-all rounded-none text-center w-full"
                 >
                   <IconLink size={18} className="text-muted-foreground" />
                   <span className="text-xs font-semibold tracking-wide uppercase text-foreground">
@@ -160,12 +172,12 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                 </button>
               </motion.div>
             ) : (
-              <motion.form 
+              <motion.form
                 key="form"
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
-                onSubmit={handleSubmit} 
+                onSubmit={handleSubmit}
                 className="flex flex-col gap-8"
               >
                 <div className="flex flex-col gap-2 relative group">
@@ -175,7 +187,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Title"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-4 text-xl sm:text-2xl font-medium tracking-tight text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-4 text-xl sm:text-2xl font-medium tracking-tight text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case"
                     autoFocus
                     required
                   />
@@ -188,11 +200,13 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-4 text-sm sm:text-base font-mono tracking-wide text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-4 text-sm sm:text-base font-mono tracking-wide text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case"
                     required
                   />
                   {url === "mailto:" && (
-                    <span className="text-[10px] text-muted-foreground absolute -bottom-5 left-0">Enter your email address after the colon.</span>
+                    <span className="text-[10px] text-muted-foreground absolute -bottom-5 left-0">
+                      Enter your email address after the colon.
+                    </span>
                   )}
                 </div>
 
@@ -200,15 +214,17 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                   <button
                     type="submit"
                     disabled={loading || !title.trim() || !url.trim()}
-                    className="bg-foreground text-background px-8 py-4 rounded-xl text-[10px] sm:text-xs uppercase tracking-widest font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
+                    className="bg-foreground text-background px-8 py-4 rounded-none text-[10px] sm:text-xs uppercase tracking-widest font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
                   >
-                    {loading ? <IconLoader2 size={16} className="animate-spin" /> : null}
+                    {loading ? (
+                      <IconLoader2 size={16} className="animate-spin" />
+                    ) : null}
                     {loading ? "Adding..." : "Add link"}
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep("presets")}
-                    className="px-8 py-4 rounded-xl text-[10px] sm:text-xs uppercase tracking-widest text-foreground hover:bg-muted transition-colors border border-border w-full sm:w-auto"
+                    className="px-8 py-4 rounded-none text-[10px] sm:text-xs uppercase tracking-widest text-foreground hover:bg-muted transition-colors border border-border w-full sm:w-auto"
                   >
                     Back to Options
                   </button>

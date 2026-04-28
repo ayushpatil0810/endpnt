@@ -61,12 +61,12 @@ export function ThemePicker({ currentBackground, onBackgroundChange }: ThemePick
               <button
                 key={preset.id}
                 onClick={() => handleUpdate(preset.id)}
-                className={`group flex flex-col items-center gap-2 p-2 rounded-xl border transition-all ${
+                className={`group flex flex-col items-center gap-2 p-2 rounded-none border transition-all ${
                   isActive ? "border-foreground bg-foreground/5 shadow-md" : "border-border/60 hover:border-foreground/40 bg-card/20"
                 }`}
               >
                 <div 
-                  className={`w-full aspect-square rounded-lg border border-border/40 relative flex items-center justify-center overflow-hidden bg-[#0a0a0a]`}
+                  className={`w-full aspect-square rounded-none border border-border/40 relative flex items-center justify-center overflow-hidden bg-[#0a0a0a]`}
                   style={preset.style}
                 >
                   {isActive && (
@@ -84,12 +84,12 @@ export function ThemePicker({ currentBackground, onBackgroundChange }: ThemePick
 
           {/* Custom Color Selector */}
           <label
-            className={`cursor-pointer group flex flex-col items-center gap-2 p-2 rounded-xl border transition-all ${
+            className={`cursor-pointer group flex flex-col items-center gap-2 p-2 rounded-none border transition-all ${
               isCustomColor ? "border-foreground bg-foreground/5 shadow-md" : "border-border/60 hover:border-foreground/40 bg-card/20"
             }`}
           >
             <div 
-              className="w-full aspect-square rounded-lg border border-border/40 relative flex items-center justify-center overflow-hidden bg-[#0a0a0a] transition-colors"
+              className="w-full aspect-square rounded-none border border-border/40 relative flex items-center justify-center overflow-hidden bg-[#0a0a0a] transition-colors"
               style={{ backgroundColor: isCustomColor ? currentBackground : undefined }}
             >
               <input 

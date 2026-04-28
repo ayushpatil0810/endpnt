@@ -1,17 +1,17 @@
 // ─── Shared primitive ─────────────────────────────────────────────────────────
 function Bone({ className = "" }: { className?: string }) {
   return (
-    <div className={`animate-pulse rounded-lg bg-foreground/[0.07] ${className}`} />
+    <div className={`animate-pulse rounded-none bg-foreground/[0.07] ${className}`} />
   );
 }
 
 // ─── GitHub Stats skeleton ────────────────────────────────────────────────────
 export function GithubStatsSkeleton() {
   return (
-    <div className="w-full p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4">
+    <div className="w-full p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4">
       {/* Icon + label */}
       <div className="flex items-center gap-3">
-        <Bone className="size-6 rounded-md" />
+        <Bone className="size-6 rounded-none" />
         <div className="flex flex-col gap-1.5">
           <Bone className="h-3 w-14" />
           <Bone className="h-2.5 w-20" />
@@ -20,7 +20,7 @@ export function GithubStatsSkeleton() {
       {/* 3 stat boxes */}
       <div className="grid grid-cols-3 gap-2 mt-2">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex flex-col items-center justify-center p-3 rounded-xl bg-card/20 border border-border/20 gap-2">
+          <div key={i} className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20 gap-2">
             <Bone className="h-5 w-8" />
             <Bone className="h-2 w-10" />
           </div>
@@ -33,7 +33,7 @@ export function GithubStatsSkeleton() {
 // ─── GitHub Calendar skeleton ─────────────────────────────────────────────────
 export function GithubCalendarSkeleton() {
   return (
-    <div className="w-full p-5 sm:p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md">
+    <div className="w-full p-5 sm:p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md">
       {/* Label */}
       <Bone className="h-2.5 w-28 mb-4" />
       {/* Calendar grid approximation */}
@@ -43,7 +43,7 @@ export function GithubCalendarSkeleton() {
             {[...Array(26)].map((_, col) => (
               <div
                 key={col}
-                className="animate-pulse rounded-sm bg-foreground/[0.07]"
+                className="animate-pulse rounded-none bg-foreground/[0.07]"
                 style={{ width: 14, height: 14 }}
               />
             ))}
@@ -57,12 +57,12 @@ export function GithubCalendarSkeleton() {
 // ─── LeetCode Stats skeleton ──────────────────────────────────────────────────
 export function LeetcodeStatsSkeleton() {
   return (
-    <div className="w-full p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 relative overflow-hidden">
+    <div className="w-full p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 relative overflow-hidden">
       {/* Glow placeholder */}
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-foreground/[0.03] blur-3xl rounded-full pointer-events-none" />
       {/* Icon + label */}
       <div className="flex items-center gap-3 z-10">
-        <Bone className="size-6 rounded-md" />
+        <Bone className="size-6 rounded-none" />
         <div className="flex flex-col gap-1.5">
           <Bone className="h-3 w-16" />
           <Bone className="h-2.5 w-20" />
@@ -71,7 +71,7 @@ export function LeetcodeStatsSkeleton() {
       {/* 3 stat boxes */}
       <div className="grid grid-cols-3 gap-2 mt-2 z-10">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex flex-col items-center justify-center p-3 rounded-xl bg-card/20 border border-border/20 gap-2">
+          <div key={i} className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20 gap-2">
             <Bone className="h-5 w-8" />
             <Bone className="h-2 w-10" />
           </div>
@@ -92,16 +92,16 @@ export function FeaturedProjectsSkeleton() {
       {/* 2 Project Cards */}
       <div className="grid grid-cols-1 gap-3">
         {[...Array(2)].map((_, i) => (
-          <div key={i} className="flex flex-col gap-3 p-5 sm:p-6 rounded-2xl border border-border/30 bg-foreground/[0.03] backdrop-blur-md">
+          <div key={i} className="flex flex-col gap-3 p-5 sm:p-6 rounded-none border border-border/30 bg-foreground/[0.03] backdrop-blur-md">
             {/* Title row */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 w-full">
-                <Bone className="size-8 rounded-lg shrink-0" />
+                <Bone className="size-8 rounded-none shrink-0" />
                 <Bone className="h-4 w-40" />
               </div>
               <div className="flex gap-2">
-                <Bone className="h-6 w-14 rounded-lg" />
-                <Bone className="h-6 w-16 rounded-lg" />
+                <Bone className="h-6 w-14 rounded-none" />
+                <Bone className="h-6 w-16 rounded-none" />
               </div>
             </div>
             {/* Description */}
@@ -125,7 +125,7 @@ export function FeaturedProjectsSkeleton() {
 // ─── Shared article card skeleton ─────────────────────────────────────────────
 function ArticleCardSkeleton() {
   return (
-    <div className="flex flex-col gap-3 p-5 rounded-2xl border border-border/30 bg-foreground/[0.03] backdrop-blur-md">
+    <div className="flex flex-col gap-3 p-5 rounded-none border border-border/30 bg-foreground/[0.03] backdrop-blur-md">
       {/* Platform badge */}
       <Bone className="h-5 w-20 rounded-full" />
       {/* Title */}

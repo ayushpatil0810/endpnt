@@ -18,12 +18,12 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         {projects.map((project) => (
           <div
             key={project.id}
-            className="group flex flex-col gap-3 p-5 sm:p-6 rounded-2xl bg-card/5 hover:bg-card/15 border border-border/40 hover:border-foreground/25 transition-all duration-300 backdrop-blur-md"
+            className="group flex flex-col gap-3 p-5 sm:p-6 rounded-none bg-card/5 hover:bg-card/15 border border-border/40 hover:border-foreground/25 transition-all duration-300 backdrop-blur-md"
           >
             {/* Title row */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="shrink-0 flex items-center justify-center size-8 rounded-lg bg-foreground/6 border border-border/30 group-hover:border-foreground/20 transition-colors">
+                <div className="shrink-0 flex items-center justify-center size-8 rounded-none bg-foreground/6 border border-border/30 group-hover:border-foreground/20 transition-colors">
                   <IconCode size={15} className="text-foreground/70 group-hover:text-foreground transition-colors" />
                 </div>
                 <h3 className="text-sm font-semibold tracking-tight text-foreground/90 group-hover:text-foreground transition-colors normal-case leading-snug">
@@ -38,7 +38,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-lg border border-border/40 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/5 transition-all"
+                    className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-none border border-border/40 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/5 transition-all"
                   >
                     <IconExternalLink size={11} />
                     Live
@@ -49,7 +49,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-lg border border-border/40 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/5 transition-all"
+                    className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-none border border-border/40 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/5 transition-all"
                   >
                     <IconBrandGithub size={11} />
                     GitHub

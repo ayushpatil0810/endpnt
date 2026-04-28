@@ -26,6 +26,7 @@ const DevToIcon = () => (
 export async function DevtoPosts({ username }: { username: string }) {
   if (!username) return null;
 
+  let articles: DevToArticle[] = [];
   try {
     const res = await fetch(
       `https://dev.to/api/articles?username=${username}&per_page=3`,
@@ -33,11 +34,14 @@ export async function DevtoPosts({ username }: { username: string }) {
     );
 
     if (!res.ok) return null;
-    const articles: DevToArticle[] = await res.json();
+    articles = await res.json();
     if (!articles || articles.length === 0) return null;
+  } catch {
+    return null;
+  }
 
-    return (
-      <section className="flex flex-col gap-4 w-full mb-8">
+  return (
+    <section className="flex flex-col gap-4 w-full mb-8">
         <div className="flex items-center justify-between gap-3 border-b border-border/40 pb-2">
           <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
             Dev Publications
@@ -65,7 +69,7 @@ export async function DevtoPosts({ username }: { username: string }) {
                   "--hb": DEVTO_HOVER_BORDER,
                 } as React.CSSProperties
               }
-              className="group relative flex flex-col gap-3 p-5 rounded-2xl border transition-all duration-300 backdrop-blur-md overflow-hidden hover:border-[var(--hb)] hover:-translate-y-0.5 hover:shadow-lg"
+              className="group relative flex flex-col gap-3 p-5 rounded-none border transition-all duration-300 backdrop-blur-md overflow-hidden hover:border-[var(--hb)] hover:-translate-y-0.5 hover:shadow-lg"
             >
               {/* Ambient glow */}
               <div
@@ -136,7 +140,4 @@ export async function DevtoPosts({ username }: { username: string }) {
         </div>
       </section>
     );
-  } catch {
-    return null;
-  }
 }

@@ -95,14 +95,14 @@ export function ProfileHeader({
               rows={3}
               maxLength={160}
               placeholder="Add a bio..."
-              className="w-full min-h-24 resize-none bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+              className="w-full min-h-24 resize-none bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
               autoFocus
             />
             <div className="flex items-center gap-4">
               <button
                 onClick={saveBio}
                 disabled={saving}
-                className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
               >
                 {saving ? (
                   <IconLoader2 size={14} className="animate-spin" />
@@ -113,7 +113,7 @@ export function ProfileHeader({
               </button>
               <button
                 onClick={cancel}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-transparent hover:border-border"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-transparent hover:border-border"
               >
                 <IconX size={14} />
                 Cancel

@@ -35,13 +35,21 @@ export function LinkIcon({ title, url, className = "" }: LinkIconProps) {
   if (t.includes("linkedin") || u.includes("linkedin.com")) return <IconBrandLinkedin {...iconProps} />;
   if (t.includes("whatsapp") || u.includes("wa.me")) return <IconBrandWhatsapp {...iconProps} />;
 
+  let hostname = "";
+  let isUrlValid = false;
+
   try {
-    if (!u.startsWith("http://") && !u.startsWith("https://")) {
-      return <IconLink {...iconProps} />;
+    if (u.startsWith("http://") || u.startsWith("https://")) {
+      hostname = new URL(url).hostname;
+      isUrlValid = true;
     }
-    const hostname = new URL(url).hostname;
-    return <img src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`} alt="" className={`w-5 h-5 shrink-0 rounded-sm object-cover bg-white/10 ${className}`} />;
   } catch {
+    // Ignore error, handle via check below
+  }
+
+  if (!isUrlValid) {
     return <IconLink {...iconProps} />;
   }
+
+  return <img src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`} alt="" className={`w-5 h-5 shrink-0 rounded-none object-cover bg-white/10 ${className}`} />;
 }

@@ -87,8 +87,8 @@
   --input: oklch(0.25 0 0);
   --ring: oklch(0.8 0 0);
 
-  --radius: 0.5rem;
-  /* Slightly sharper radius for a modern feel */
+  --radius: 0rem;
+  /* Sharp borders for everything */
 
   --sidebar: oklch(0.13 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
@@ -205,9 +205,11 @@
   animation: none;
   mix-blend-mode: normal;
 }
+
 ::view-transition-old(root) {
   z-index: 1;
 }
+
 ::view-transition-new(root) {
   z-index: 2;
 }

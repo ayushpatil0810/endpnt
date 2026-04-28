@@ -9,20 +9,24 @@ const LeetCodeIcon = () => (
 export async function LeetcodeStats({ username }: { username: string }) {
   if (!username) return null;
 
+  let data;
   try {
     const res = await fetch(`https://alfa-leetcode-api.onrender.com/${username}/solved`, { next: { revalidate: 3600 } });
     if (!res.ok) return null;
-    const data = await res.json();
+    data = await res.json();
     
     // API returns errors as { errors: [...] } for invalid users
     if (data.errors) return null;
+  } catch {
+    return null;
+  }
 
-    return (
-      <a
+  return (
+    <a
         href={`https://leetcode.com/${username}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full p-6 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 group hover:border-[#FFA116]/40 transition-colors relative overflow-hidden"
+        className="w-full p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 group hover:border-[#FFA116]/40 transition-colors relative overflow-hidden"
       >
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#FFA116]/10 blur-3xl rounded-full pointer-events-none" />
         <div className="flex items-center gap-3 z-10">
@@ -33,22 +37,19 @@ export async function LeetcodeStats({ username }: { username: string }) {
           </div>
         </div>
         <div className="grid grid-cols-3 gap-2 mt-2 z-10">
-          <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-card/20 border border-border/20">
+          <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
             <span className="text-lg font-bold text-foreground">{data.solvedProblem || 0}</span>
             <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Solved</span>
           </div>
-          <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-card/20 border border-border/20">
+          <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
             <span className="text-lg font-bold text-emerald-400">{data.easySolved || 0}</span>
             <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Easy</span>
           </div>
-          <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-card/20 border border-border/20">
+          <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
             <span className="text-lg font-bold text-amber-500">{data.mediumSolved || 0}</span>
             <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Medium</span>
           </div>
         </div>
       </a>
     );
-  } catch {
-    return null;
-  }
 }

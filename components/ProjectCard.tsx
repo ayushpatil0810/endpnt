@@ -23,7 +23,7 @@ interface ProjectCardProps {
 }
 
 const INPUT_CLASS =
-  "w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case";
+  "w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case";
 
 export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
   const [editing, setEditing] = useState(false);
@@ -127,7 +127,7 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing text-muted-foreground opacity-50 hover:opacity-100 transition-all touch-none py-2 rounded-md mt-1"
+          className="cursor-grab active:cursor-grabbing text-muted-foreground opacity-50 hover:opacity-100 transition-all touch-none py-2 rounded-none mt-1"
           aria-label="Reorder"
         >
           <IconGripVertical size={20} stroke={1.5} />
@@ -179,14 +179,14 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
                 <button
                   onClick={save}
                   disabled={saving}
-                  className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
                 >
                   {saving ? <IconLoader2 size={12} className="animate-spin" /> : <IconCheck size={12} />}
                   Save
                 </button>
                 <button
                   onClick={cancelEdit}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-transparent hover:border-border"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-transparent hover:border-border"
                 >
                   <IconX size={12} /> Cancel
                 </button>
@@ -253,14 +253,14 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
           <div className="flex items-center gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity duration-300 ml-auto mr-0 sm:mr-4 flex-col sm:flex-row">
             <button
               onClick={() => setEditing(true)}
-              className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition-colors border border-border rounded-lg px-3 py-1.5 hover:bg-muted"
+              className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition-colors border border-border rounded-none px-3 py-1.5 hover:bg-muted"
             >
               Edit
             </button>
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-destructive transition-colors border border-border rounded-lg px-3 py-1.5 hover:bg-destructive/10 disabled:opacity-50"
+              className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-destructive transition-colors border border-border rounded-none px-3 py-1.5 hover:bg-destructive/10 disabled:opacity-50"
             >
               {deleting ? <IconLoader2 size={12} className="animate-spin" /> : "Delete"}
             </button>

@@ -86,7 +86,7 @@ export function ShareModal({ isOpen, onClose, profileUrl, username }: ShareModal
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="relative w-full max-w-sm bg-card border border-border/40 rounded-3xl p-6 sm:p-8 flex flex-col items-center gap-6 shadow-2xl z-10"
+            className="relative w-full max-w-sm bg-card border border-border/40 rounded-none p-6 sm:p-8 flex flex-col items-center gap-6 shadow-2xl z-10"
           >
             <button
               onClick={onClose}
@@ -106,7 +106,7 @@ export function ShareModal({ isOpen, onClose, profileUrl, username }: ShareModal
 
             {/* QR Code Container */}
             <div 
-              className="bg-foreground p-4 rounded-2xl w-full aspect-square flex items-center justify-center shadow-inner"
+              className="bg-foreground p-4 rounded-none w-full aspect-square flex items-center justify-center shadow-inner"
               ref={qrRef}
             >
               <QRCode
@@ -121,14 +121,14 @@ export function ShareModal({ isOpen, onClose, profileUrl, username }: ShareModal
             <div className="flex w-full gap-3 mt-2">
               <button
                 onClick={handleCopyLink}
-                className="flex-1 flex items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 text-foreground py-3 rounded-xl text-[10px] uppercase font-medium tracking-widest transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 text-foreground py-3 rounded-none text-[10px] uppercase font-medium tracking-widest transition-colors"
               >
                 <IconShare size={16} />
                 Copy Link
               </button>
               <button
                 onClick={handleDownload}
-                className="flex-1 flex items-center justify-center gap-2 bg-foreground hover:bg-foreground/90 text-background py-3 rounded-xl text-[10px] uppercase font-medium tracking-widest transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 bg-foreground hover:bg-foreground/90 text-background py-3 rounded-none text-[10px] uppercase font-medium tracking-widest transition-colors"
               >
                 <IconDownload size={16} />
                 Download

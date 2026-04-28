@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, type CSSProperties } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  type CSSProperties,
+} from "react";
 import { flushSync } from "react-dom";
 import {
   DndContext,
@@ -30,7 +36,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { User, Link as DbLink, Project } from "@/db/schema/schema";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconSun, IconMoon, IconExternalLink, IconLogout, IconShare } from "@tabler/icons-react";
+import {
+  IconSun,
+  IconMoon,
+  IconExternalLink,
+  IconLogout,
+  IconShare,
+} from "@tabler/icons-react";
 
 interface DashboardClientProps {
   user: User;
@@ -90,8 +102,12 @@ export function DashboardClient({
     user.leetcodeUsername ?? "",
   );
   const [devtoUsername, setDevtoUsername] = useState(user.devtoUsername ?? "");
-  const [mediumUsername, setMediumUsername] = useState(user.mediumUsername ?? "");
-  const [hashnodeUsername, setHashnodeUsername] = useState(user.hashnodeUsername ?? "");
+  const [mediumUsername, setMediumUsername] = useState(
+    user.mediumUsername ?? "",
+  );
+  const [hashnodeUsername, setHashnodeUsername] = useState(
+    user.hashnodeUsername ?? "",
+  );
   const [seoTitle, setSeoTitle] = useState(user.seoTitle ?? "");
   const [seoDescription, setSeoDescription] = useState(
     user.seoDescription ?? "",
@@ -125,8 +141,12 @@ export function DashboardClient({
     }
 
     // Calculate origin and max radius
-    const x = btn ? btn.getBoundingClientRect().left + btn.offsetWidth / 2 : window.innerWidth / 2;
-    const y = btn ? btn.getBoundingClientRect().top + btn.offsetHeight / 2 : window.innerHeight / 2;
+    const x = btn
+      ? btn.getBoundingClientRect().left + btn.offsetWidth / 2
+      : window.innerWidth / 2;
+    const y = btn
+      ? btn.getBoundingClientRect().top + btn.offsetHeight / 2
+      : window.innerHeight / 2;
     const maxRadius = Math.hypot(
       Math.max(x, window.innerWidth - x),
       Math.max(y, window.innerHeight - y),
@@ -143,7 +163,7 @@ export function DashboardClient({
         `circle(0px at ${x}px ${y}px)`,
         `circle(${maxRadius}px at ${x}px ${y}px)`,
       ];
-      
+
       document.documentElement.animate(
         {
           clipPath: clipPath,
@@ -152,7 +172,7 @@ export function DashboardClient({
           duration: 600,
           easing: "cubic-bezier(0.4, 0, 0.2, 1)",
           pseudoElement: "::view-transition-new(root)",
-        }
+        },
       );
     });
   }, [dashboardTheme]);
@@ -306,7 +326,13 @@ export function DashboardClient({
     } catch {
       toast.error("Failed to update integrations");
     }
-  }, [githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername]);
+  }, [
+    githubUsername,
+    leetcodeUsername,
+    devtoUsername,
+    mediumUsername,
+    hashnodeUsername,
+  ]);
 
   const handleSeoSave = useCallback(async () => {
     try {
@@ -375,21 +401,21 @@ export function DashboardClient({
             <IconShare size={14} />
             <span className="hidden sm:inline">Share</span>
           </button>
-          
+
           <a
             href={`/${user.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-foreground hover:bg-muted border border-border/50 hover:border-border transition-colors px-3 py-1.5 rounded-lg"
+            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-foreground hover:bg-muted border border-border/50 hover:border-border transition-colors px-3 py-1.5 rounded-none"
             aria-label="View profile"
           >
             <IconExternalLink size={16} />
             <span className="hidden sm:inline">View profile</span>
           </a>
-          
+
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors px-3 py-1.5 rounded-lg"
+            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors px-3 py-1.5 rounded-none"
             aria-label="Sign out"
           >
             <IconLogout size={16} />
@@ -474,7 +500,7 @@ export function DashboardClient({
                     value={githubUsername}
                     onChange={(e) => setGithubUsername(e.target.value)}
                     placeholder="e.g. torvalds"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                   />
                 </div>
 
@@ -491,7 +517,7 @@ export function DashboardClient({
                     value={leetcodeUsername}
                     onChange={(e) => setLeetcodeUsername(e.target.value)}
                     placeholder="e.g. neetcode"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                   />
                 </div>
               </div>
@@ -509,7 +535,7 @@ export function DashboardClient({
                   value={devtoUsername}
                   onChange={(e) => setDevtoUsername(e.target.value)}
                   placeholder="e.g. ben"
-                  className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                  className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                 />
               </div>
 
@@ -527,7 +553,7 @@ export function DashboardClient({
                     value={mediumUsername}
                     onChange={(e) => setMediumUsername(e.target.value)}
                     placeholder="e.g. jdoe"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                   />
                 </div>
 
@@ -544,7 +570,7 @@ export function DashboardClient({
                     value={hashnodeUsername}
                     onChange={(e) => setHashnodeUsername(e.target.value)}
                     placeholder="e.g. jdoe"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                   />
                 </div>
               </div>
@@ -553,7 +579,7 @@ export function DashboardClient({
                 <button
                   type="button"
                   onClick={handleIntegrationSave}
-                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-medium transition-colors"
+                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium transition-colors"
                 >
                   Save Config
                 </button>
@@ -587,7 +613,7 @@ export function DashboardClient({
                     value={seoTitle}
                     onChange={(e) => setSeoTitle(e.target.value)}
                     placeholder="e.g. John Doe - Full-stack Engineer"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                   />
                 </div>
 
@@ -603,7 +629,7 @@ export function DashboardClient({
                     value={seoDescription}
                     onChange={(e) => setSeoDescription(e.target.value)}
                     placeholder="e.g. Check out my latest articles and source code."
-                    className="w-full min-h-24 resize-none bg-card/20 border border-border/60 hover:border-foreground/40 rounded-xl px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
+                    className="w-full min-h-24 resize-none bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
                   />
                 </div>
               </div>
@@ -612,7 +638,7 @@ export function DashboardClient({
                 <button
                   type="button"
                   onClick={handleSeoSave}
-                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-xl text-[10px] uppercase tracking-widest font-medium transition-colors"
+                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium transition-colors"
                 >
                   Save SEO
                 </button>
@@ -630,8 +656,20 @@ export function DashboardClient({
                 onBackgroundChange={setBackground}
               />
             </motion.section>
+          </div>
 
-            {/* Featured Projects Section */}
+          {/* Right Column: Links Management & Analytics */}
+          <div className="lg:col-span-8 flex flex-col gap-12 lg:gap-16">
+            {/* Analytics Dashboard */}
+            <motion.section
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+            >
+              <AnalyticsDashboard views={user.views ?? 0} links={links} />
+            </motion.section>
+
+            {/* Featured Projects Section (Moved here from left column) */}
             <motion.section
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
@@ -643,7 +681,8 @@ export function DashboardClient({
                   Featured Projects
                 </h2>
                 <div className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
-                  {projects.length} {projects.length === 1 ? "project" : "projects"}
+                  {projects.length}{" "}
+                  {projects.length === 1 ? "project" : "projects"}
                 </div>
               </div>
 
@@ -681,18 +720,6 @@ export function DashboardClient({
               <div className="mt-2">
                 <ProjectForm onProjectAdded={handleProjectAdded} />
               </div>
-            </motion.section>
-          </div>
-
-          {/* Right Column: Links Management & Analytics */}
-          <div className="lg:col-span-8 flex flex-col gap-12 lg:gap-16">
-            {/* Analytics Dashboard */}
-            <motion.section
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.25 }}
-            >
-              <AnalyticsDashboard views={user.views ?? 0} links={links} />
             </motion.section>
 
             {/* Links Editor */}
