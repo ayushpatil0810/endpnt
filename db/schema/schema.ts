@@ -14,6 +14,7 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   theme: text("theme").default("default").notNull(),
   background: text("background").default("aurora").notNull(),
+  resumeUrl: text("resume_url"),
   githubUsername: text("github_username"),
   leetcodeUsername: text("leetcode_username"),
   devtoUsername: text("devto_username"),
