@@ -42,6 +42,15 @@ import {
   IconExternalLink,
   IconLogout,
   IconShare,
+  IconChartBar,
+  IconLink,
+  IconBriefcase,
+  IconUser,
+  IconPalette,
+  IconSettings,
+  IconEye,
+  IconClick,
+  IconTrendingUp,
 } from "@tabler/icons-react";
 
 interface DashboardClientProps {
@@ -85,6 +94,17 @@ const DASHBOARD_LIGHT_THEME_VARS = {
   "--sidebar-ring": "oklch(0.7 0 0)",
 } as const;
 
+type Tab = "analytics" | "links" | "projects" | "profile" | "appearance" | "seo";
+
+const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
+  { id: "analytics", label: "Analytics", icon: IconChartBar },
+  { id: "links", label: "Links", icon: IconLink },
+  { id: "projects", label: "Projects", icon: IconBriefcase },
+  { id: "profile", label: "Profile & Dev", icon: IconUser },
+  { id: "appearance", label: "Appearance", icon: IconPalette },
+  { id: "seo", label: "SEO Settings", icon: IconSettings },
+];
+
 export function DashboardClient({
   user,
   initialLinks,
@@ -95,35 +115,33 @@ export function DashboardClient({
   const [links, setLinks] = useState<DbLink[]>(initialLinks);
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [bio, setBio] = useState(user.bio ?? "");
-  const [githubUsername, setGithubUsername] = useState(
-    user.githubUsername ?? "",
-  );
-  const [leetcodeUsername, setLeetcodeUsername] = useState(
-    user.leetcodeUsername ?? "",
-  );
+  const [githubUsername, setGithubUsername] = useState(user.githubUsername ?? "");
+  const [leetcodeUsername, setLeetcodeUsername] = useState(user.leetcodeUsername ?? "");
   const [devtoUsername, setDevtoUsername] = useState(user.devtoUsername ?? "");
-  const [mediumUsername, setMediumUsername] = useState(
-    user.mediumUsername ?? "",
-  );
-  const [hashnodeUsername, setHashnodeUsername] = useState(
-    user.hashnodeUsername ?? "",
-  );
+  const [mediumUsername, setMediumUsername] = useState(user.mediumUsername ?? "");
+  const [hashnodeUsername, setHashnodeUsername] = useState(user.hashnodeUsername ?? "");
   const [seoTitle, setSeoTitle] = useState(user.seoTitle ?? "");
-  const [seoDescription, setSeoDescription] = useState(
-    user.seoDescription ?? "",
-  );
+  const [seoDescription, setSeoDescription] = useState(user.seoDescription ?? "");
   const [avatarUrl] = useState(user.avatarUrl ?? authUser.image ?? null);
   const [background, setBackground] = useState(user.background ?? "aurora");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [dashboardTheme, setDashboardTheme] = useState<DashboardTheme>("dark");
   const [isThemeReady, setIsThemeReady] = useState(false);
   const toggleBtnRef = useRef<HTMLButtonElement>(null);
+  
+  const [activeTab, setActiveTab] = useState<Tab>("links");
+  const [origin, setOrigin] = useState("https://endpnt.dev");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        document.getElementById("add-new-link-btn")?.click();
+        setActiveTab("links");
+        setTimeout(() => document.getElementById("add-new-link-btn")?.click(), 100);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -140,13 +158,8 @@ export function DashboardClient({
       return;
     }
 
-    // Calculate origin and max radius
-    const x = btn
-      ? btn.getBoundingClientRect().left + btn.offsetWidth / 2
-      : window.innerWidth / 2;
-    const y = btn
-      ? btn.getBoundingClientRect().top + btn.offsetHeight / 2
-      : window.innerHeight / 2;
+    const x = btn ? btn.getBoundingClientRect().left + btn.offsetWidth / 2 : window.innerWidth / 2;
+    const y = btn ? btn.getBoundingClientRect().top + btn.offsetHeight / 2 : window.innerHeight / 2;
     const maxRadius = Math.hypot(
       Math.max(x, window.innerWidth - x),
       Math.max(y, window.innerHeight - y),
@@ -165,9 +178,7 @@ export function DashboardClient({
       ];
 
       document.documentElement.animate(
-        {
-          clipPath: clipPath,
-        },
+        { clipPath: clipPath },
         {
           duration: 600,
           easing: "cubic-bezier(0.4, 0, 0.2, 1)",
@@ -179,48 +190,26 @@ export function DashboardClient({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  function handleLinkAdded(newLink: DbLink) {
-    setLinks((prev) => [...prev, newLink]);
-  }
-
-  function handleLinkUpdated(updated: DbLink) {
-    setLinks((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
-  }
-
-  function handleLinkDeleted(id: string) {
-    setLinks((prev) => prev.filter((l) => l.id !== id));
-  }
+  // Link Handlers
+  function handleLinkAdded(newLink: DbLink) { setLinks((prev) => [...prev, newLink]); }
+  function handleLinkUpdated(updated: DbLink) { setLinks((prev) => prev.map((l) => (l.id === updated.id ? updated : l))); }
+  function handleLinkDeleted(id: string) { setLinks((prev) => prev.filter((l) => l.id !== id)); }
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
     const oldIndex = links.findIndex((l) => l.id === active.id);
     const newIndex = links.findIndex((l) => l.id === over.id);
-
-    const reordered = arrayMove(links, oldIndex, newIndex).map((link, idx) => ({
-      ...link,
-      displayOrder: idx,
-    }));
-
+    const reordered = arrayMove(links, oldIndex, newIndex).map((link, idx) => ({ ...link, displayOrder: idx }));
     setLinks(reordered);
-
-    // Persist reorder
     try {
       const res = await fetch("/api/links/reorder", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          updates: reordered.map((l) => ({
-            id: l.id,
-            displayOrder: l.displayOrder,
-          })),
-        }),
+        body: JSON.stringify({ updates: reordered.map((l) => ({ id: l.id, displayOrder: l.displayOrder })) }),
       });
       if (!res.ok) throw new Error("Sync failed");
     } catch {
@@ -228,43 +217,23 @@ export function DashboardClient({
     }
   }
 
-  function handleProjectAdded(newProject: Project) {
-    setProjects((prev) => [...prev, newProject]);
-  }
-
-  function handleProjectUpdated(updated: Project) {
-    setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-  }
-
-  function handleProjectDeleted(id: string) {
-    setProjects((prev) => prev.filter((p) => p.id !== id));
-  }
+  // Project Handlers
+  function handleProjectAdded(newProject: Project) { setProjects((prev) => [...prev, newProject]); }
+  function handleProjectUpdated(updated: Project) { setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p))); }
+  function handleProjectDeleted(id: string) { setProjects((prev) => prev.filter((p) => p.id !== id)); }
 
   async function handleProjectDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
     const oldIndex = projects.findIndex((p) => p.id === active.id);
     const newIndex = projects.findIndex((p) => p.id === over.id);
-
-    const reordered = arrayMove(projects, oldIndex, newIndex).map((p, idx) => ({
-      ...p,
-      displayOrder: idx,
-    }));
-
+    const reordered = arrayMove(projects, oldIndex, newIndex).map((p, idx) => ({ ...p, displayOrder: idx }));
     setProjects(reordered);
-
-    // Persist reorder
     try {
       const res = await fetch("/api/projects/reorder", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          updates: reordered.map((p) => ({
-            id: p.id,
-            displayOrder: p.displayOrder,
-          })),
-        }),
+        body: JSON.stringify({ updates: reordered.map((p) => ({ id: p.id, displayOrder: p.displayOrder })) }),
       });
       if (!res.ok) throw new Error("Sync failed");
     } catch {
@@ -277,16 +246,8 @@ export function DashboardClient({
     router.push("/");
   }, [router]);
 
-  const [origin, setOrigin] = useState("https://endpnt.dev");
-
   useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
-
-  useEffect(() => {
-    const storedTheme = window.localStorage.getItem(
-      DASHBOARD_THEME_STORAGE_KEY,
-    );
+    const storedTheme = window.localStorage.getItem(DASHBOARD_THEME_STORAGE_KEY);
     if (storedTheme === "light" || storedTheme === "dark") {
       setDashboardTheme(storedTheme);
     }
@@ -300,10 +261,7 @@ export function DashboardClient({
 
   const dashboardThemeStyle: CSSProperties =
     dashboardTheme === "light"
-      ? ({
-          ...DASHBOARD_LIGHT_THEME_VARS,
-          colorScheme: "light",
-        } as CSSProperties)
+      ? ({ ...DASHBOARD_LIGHT_THEME_VARS, colorScheme: "light" } as CSSProperties)
       : ({ colorScheme: "dark" } as CSSProperties);
 
   const profileUrl = `${origin}/${user.username}`;
@@ -313,26 +271,14 @@ export function DashboardClient({
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          githubUsername,
-          leetcodeUsername,
-          devtoUsername,
-          mediumUsername,
-          hashnodeUsername,
-        }),
+        body: JSON.stringify({ githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername }),
       });
       if (!res.ok) throw new Error("Failed to save profile");
       toast.success("Integrations updated!");
     } catch {
       toast.error("Failed to update integrations");
     }
-  }, [
-    githubUsername,
-    leetcodeUsername,
-    devtoUsername,
-    mediumUsername,
-    hashnodeUsername,
-  ]);
+  }, [githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername]);
 
   const handleSeoSave = useCallback(async () => {
     try {
@@ -348,24 +294,27 @@ export function DashboardClient({
     }
   }, [seoTitle, seoDescription]);
 
+  const totalViews = user.views ?? 0;
+  const totalClicks = links.reduce((sum, link) => sum + (link.clicks ?? 0), 0);
+  const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : "0.0";
+
   return (
     <div
       data-dashboard-theme={dashboardTheme}
-      className="min-h-dvh bg-background flex flex-col uppercase selection:bg-primary/20"
+      className="min-h-dvh bg-background flex flex-col font-sans selection:bg-primary/20"
       style={dashboardThemeStyle}
     >
       {/* Top Nav */}
-      <nav className="w-full border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-40 px-6 sm:px-12 py-4 flex items-center justify-between">
-        <div className="font-bold text-sm tracking-widest text-foreground">
+      <nav className="w-full border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-40 px-6 sm:px-8 py-3 flex items-center justify-between">
+        <div className="font-bold text-sm tracking-widest text-foreground uppercase font-mono">
           endpnt.
         </div>
-        <div className="flex items-center gap-4 sm:gap-8">
-          {/* Sun / Moon toggle */}
+        <div className="flex items-center gap-2 sm:gap-4">
           <button
             ref={toggleBtnRef}
             aria-label="Toggle theme"
             onClick={handleThemeToggle}
-            className="relative flex items-center justify-center size-9 rounded-full border border-border/50 bg-card/40 hover:bg-card/80 text-foreground transition-all duration-200 cursor-pointer overflow-hidden"
+            className="relative flex items-center justify-center size-8 rounded-full border border-border/50 bg-card/40 hover:bg-card/80 text-foreground transition-all duration-200 cursor-pointer overflow-hidden"
           >
             <AnimatePresence mode="wait" initial={false}>
               {dashboardTheme === "dark" ? (
@@ -377,7 +326,7 @@ export function DashboardClient({
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   className="absolute flex items-center justify-center"
                 >
-                  <IconMoon size={15} stroke={1.5} />
+                  <IconMoon size={14} stroke={1.5} />
                 </motion.span>
               ) : (
                 <motion.span
@@ -388,14 +337,15 @@ export function DashboardClient({
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   className="absolute flex items-center justify-center"
                 >
-                  <IconSun size={15} stroke={1.5} />
+                  <IconSun size={14} stroke={1.5} />
                 </motion.span>
               )}
             </AnimatePresence>
           </button>
+          
           <button
             onClick={() => setIsShareModalOpen(true)}
-            className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-widest font-semibold text-background bg-foreground hover:bg-foreground/90 transition-colors px-4 py-2 rounded-full"
+            className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-widest font-semibold text-background bg-foreground hover:bg-foreground/90 transition-colors px-3 py-1.5 rounded-md"
             aria-label="Share profile"
           >
             <IconShare size={14} />
@@ -403,384 +353,254 @@ export function DashboardClient({
           </button>
 
           <a
-            href={`/${user.username}`}
+            href={profileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-foreground hover:bg-muted border border-border/50 hover:border-border transition-colors px-3 py-1.5 rounded-none"
+            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-foreground hover:bg-muted border border-border/50 hover:border-border transition-colors px-3 py-1.5 rounded-md"
             aria-label="View profile"
           >
-            <IconExternalLink size={16} />
-            <span className="hidden sm:inline">View profile</span>
+            <IconExternalLink size={14} />
+            <span className="hidden sm:inline">View Profile</span>
           </a>
-
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors px-3 py-1.5 rounded-none"
-            aria-label="Sign out"
-          >
-            <IconLogout size={16} />
-            <span className="hidden sm:inline">Sign out</span>
-          </button>
         </div>
       </nav>
 
-      <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 sm:px-12 py-8 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-24 items-start">
-          {/* Left Column: Profile & Settings */}
-          <div className="lg:col-span-4 flex flex-col gap-10 lg:gap-16 relative lg:sticky lg:top-32">
-            {/* Profile URL Banner - Extremely flat */}
-            <motion.div
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="flex flex-col gap-4 border-b border-border/40 pb-8"
-            >
-              <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium text-left">
-                Your Endpnt URL
-              </h2>
-              <div className="flex items-end justify-between gap-4 flex-wrap">
-                <a
-                  href={profileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-xl sm:text-2xl tracking-tight text-foreground hover:text-muted-foreground transition-colors break-all normal-case"
-                >
-                  {profileUrl.replace("https://", "")}
-                </a>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(profileUrl);
-                    toast.success("Copied to clipboard!");
-                  }}
-                  className="text-[10px] font-mono tracking-widest text-foreground hover:text-muted-foreground transition-colors whitespace-nowrap pb-1"
-                >
-                  COPY
-                </button>
-              </div>
-            </motion.div>
-
-            {/* Profile header */}
-            <motion.section
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              <ProfileHeader
-                username={user.username}
-                bio={bio}
-                avatarUrl={avatarUrl}
-                onBioUpdate={(newBio) => setBio(newBio)}
-              />
-            </motion.section>
-
-            {/* Developer Integrations */}
-            <motion.section
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="flex flex-col gap-6"
-            >
-              <div className="flex items-center justify-between border-b border-border/40 pb-4">
-                <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">
-                  Dev Stats
-                </h2>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="github"
-                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
-                  >
-                    GitHub Username
-                  </label>
-                  <input
-                    id="github"
-                    type="text"
-                    value={githubUsername}
-                    onChange={(e) => setGithubUsername(e.target.value)}
-                    placeholder="e.g. torvalds"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
-                  />
+      {/* Main Workspace */}
+      <main className="flex-1 w-full max-w-[1600px] mx-auto flex overflow-hidden h-[calc(100vh-56px)]">
+        
+        {/* Left Sidebar Navigation */}
+        <aside className="w-64 border-r border-border/40 bg-background flex-col pt-6 pb-6 overflow-y-auto hidden md:flex shrink-0">
+          <div className="px-6 pb-6 mb-2 border-b border-border/20">
+             <div className="flex items-center gap-3">
+                <div className="size-10 rounded-full border border-border/30 overflow-hidden bg-card/20 shrink-0">
+                   {avatarUrl ? (
+                     <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
+                   ) : (
+                     <div className="size-full flex items-center justify-center font-serif italic text-muted-foreground">
+                        {user.username.charAt(0).toUpperCase()}
+                     </div>
+                   )}
                 </div>
-
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="leetcode"
-                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
-                  >
-                    LeetCode Username
-                  </label>
-                  <input
-                    id="leetcode"
-                    type="text"
-                    value={leetcodeUsername}
-                    onChange={(e) => setLeetcodeUsername(e.target.value)}
-                    placeholder="e.g. neetcode"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
-                  />
+                <div className="flex flex-col overflow-hidden">
+                   <span className="text-sm font-semibold truncate text-foreground normal-case">{user.username}</span>
+                   <span className="text-[10px] uppercase font-mono text-muted-foreground truncate">
+                     {origin.replace(/^https?:\/\//, '')}/{user.username}
+                   </span>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-2 mt-4">
-                <label
-                  htmlFor="devto"
-                  className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
-                >
-                  Dev.to Username (Blog)
-                </label>
-                <input
-                  id="devto"
-                  type="text"
-                  value={devtoUsername}
-                  onChange={(e) => setDevtoUsername(e.target.value)}
-                  placeholder="e.g. ben"
-                  className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
-                />
-              </div>
-
-              <div className="flex flex-col gap-4 mt-4 sm:flex-row">
-                <div className="flex-1 flex flex-col gap-2">
-                  <label
-                    htmlFor="medium"
-                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
-                  >
-                    Medium Username
-                  </label>
-                  <input
-                    id="medium"
-                    type="text"
-                    value={mediumUsername}
-                    onChange={(e) => setMediumUsername(e.target.value)}
-                    placeholder="e.g. jdoe"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
-                  />
-                </div>
-
-                <div className="flex-1 flex flex-col gap-2">
-                  <label
-                    htmlFor="hashnode"
-                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
-                  >
-                    Hashnode Username
-                  </label>
-                  <input
-                    id="hashnode"
-                    type="text"
-                    value={hashnodeUsername}
-                    onChange={(e) => setHashnodeUsername(e.target.value)}
-                    placeholder="e.g. jdoe"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={handleIntegrationSave}
-                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium transition-colors"
-                >
-                  Save Config
-                </button>
-              </div>
-            </motion.section>
-
-            {/* Custom SEO Settings */}
-            <motion.section
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.18 }}
-              className="flex flex-col gap-6"
-            >
-              <div className="flex items-center justify-between border-b border-border/40 pb-4">
-                <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium whitespace-nowrap">
-                  SEO & Social
-                </h2>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="seoTitle"
-                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
-                  >
-                    Meta Title
-                  </label>
-                  <input
-                    id="seoTitle"
-                    type="text"
-                    value={seoTitle}
-                    onChange={(e) => setSeoTitle(e.target.value)}
-                    placeholder="e.g. John Doe - Full-stack Engineer"
-                    className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="seoDescription"
-                    className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1"
-                  >
-                    Meta Description
-                  </label>
-                  <textarea
-                    id="seoDescription"
-                    value={seoDescription}
-                    onChange={(e) => setSeoDescription(e.target.value)}
-                    placeholder="e.g. Check out my latest articles and source code."
-                    className="w-full min-h-24 resize-none bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={handleSeoSave}
-                  className="bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium transition-colors"
-                >
-                  Save SEO
-                </button>
-              </div>
-            </motion.section>
-
-            {/* Background picker */}
-            <motion.section
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <ThemePicker
-                currentBackground={background}
-                onBackgroundChange={setBackground}
-              />
-            </motion.section>
+             </div>
           </div>
 
-          {/* Right Column: Links Management & Analytics */}
-          <div className="lg:col-span-8 flex flex-col gap-12 lg:gap-16">
-            {/* Analytics Dashboard */}
-            <motion.section
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.25 }}
-            >
-              <AnalyticsDashboard views={user.views ?? 0} links={links} />
-            </motion.section>
-
-            {/* Featured Projects Section (Moved here from left column) */}
-            <motion.section
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.22 }}
-              className="flex flex-col gap-6"
-            >
-              <div className="flex items-center justify-between border-b border-border/40 pb-4">
-                <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium whitespace-nowrap">
-                  Featured Projects
-                </h2>
-                <div className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
-                  {projects.length}{" "}
-                  {projects.length === 1 ? "project" : "projects"}
-                </div>
-              </div>
-
-              <DndContext
-                id="projects-dnd-context"
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleProjectDragEnd}
-              >
-                <SortableContext
-                  items={projects.map((p) => p.id)}
-                  strategy={verticalListSortingStrategy}
+          <div className="flex flex-col px-3 gap-1">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                    isActive 
+                      ? "bg-foreground/10 text-foreground font-medium" 
+                      : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
+                  }`}
                 >
-                  <div className="flex flex-col">
-                    {projects.map((project) => (
-                      <ProjectCard
-                        key={project.id}
-                        project={project}
-                        onUpdate={handleProjectUpdated}
-                        onDelete={handleProjectDeleted}
-                      />
-                    ))}
-
-                    {projects.length === 0 && (
-                      <div className="py-8 text-center border-b border-border/40">
-                        <p className="text-muted-foreground/60 text-sm font-medium tracking-wide normal-case">
-                          No featured projects yet.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </SortableContext>
-              </DndContext>
-
-              <div className="mt-2">
-                <ProjectForm onProjectAdded={handleProjectAdded} />
-              </div>
-            </motion.section>
-
-            {/* Links Editor */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex items-center justify-between border-b border-border/40 pb-4 mb-2"
-            >
-              <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">
-                Your Links
-              </h2>
-              <div className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
-                {links.length} {links.length === 1 ? "link" : "links"}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <DndContext
-                id="dashboard-dnd-context"
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={links.map((l) => l.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="flex flex-col">
-                    {links.map((link) => (
-                      <LinkCard
-                        key={link.id}
-                        link={link}
-                        onUpdate={handleLinkUpdated}
-                        onDelete={handleLinkDeleted}
-                      />
-                    ))}
-
-                    {links.length === 0 && (
-                      <div className="py-16 text-center border-b border-border/40">
-                        <p className="text-muted-foreground/60 text-sm font-medium tracking-wide normal-case">
-                          No links yet. Add your first link below.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </SortableContext>
-              </DndContext>
-
-              <div className="mt-8">
-                <LinkForm onLinkAdded={handleLinkAdded} />
-              </div>
-            </motion.div>
+                  <Icon size={18} stroke={isActive ? 2 : 1.5} />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
+
+          <div className="mt-auto px-3 border-t border-border/20 pt-4">
+             <button
+                onClick={handleSignOut}
+                className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 w-full rounded-lg transition-colors"
+             >
+                <IconLogout size={18} stroke={1.5} />
+                Sign Out
+             </button>
+          </div>
+        </aside>
+
+        {/* Center Content Workspace */}
+        <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-8 relative hide-scrollbar">
+           <div className="w-full max-w-5xl mx-auto flex flex-col">
+              {/* Hero Analytics Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 shrink-0">
+              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                 <div className="flex items-center gap-2 text-muted-foreground">
+                    <IconEye size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Profile Views</span>
+                 </div>
+                 <div className="text-3xl font-semibold text-foreground">{totalViews.toLocaleString()}</div>
+              </div>
+              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                 <div className="flex items-center gap-2 text-muted-foreground">
+                    <IconClick size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Link Clicks</span>
+                 </div>
+                 <div className="text-3xl font-semibold text-foreground">{totalClicks.toLocaleString()}</div>
+              </div>
+              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                 <div className="flex items-center gap-2 text-muted-foreground">
+                    <IconTrendingUp size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Avg CTR</span>
+                 </div>
+                 <div className="text-3xl font-semibold text-foreground">{ctr}%</div>
+              </div>
+           </div>
+
+           {/* Tab Content */}
+           <div className="flex-1 w-full">
+              <AnimatePresence mode="wait">
+                 <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex flex-col gap-8 pb-20"
+                 >
+                    {activeTab === "analytics" && (
+                       <div className="flex flex-col gap-6">
+                          <h2 className="text-lg font-semibold text-foreground">Detailed Analytics</h2>
+                          <AnalyticsDashboard views={user.views ?? 0} links={links} />
+                       </div>
+                    )}
+
+                    {activeTab === "links" && (
+                       <div className="flex flex-col gap-6">
+                          <div className="flex items-center justify-between">
+                             <h2 className="text-lg font-semibold text-foreground">Manage Links</h2>
+                             <span className="text-xs font-mono text-muted-foreground bg-foreground/5 px-2 py-1 rounded-md border border-border/40">{links.length} Links</span>
+                          </div>
+                          
+                          <DndContext id="links-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                             <SortableContext items={links.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+                                <div className="flex flex-col gap-3">
+                                   {links.map((link) => (
+                                      <LinkCard key={link.id} link={link} onUpdate={handleLinkUpdated} onDelete={handleLinkDeleted} />
+                                   ))}
+                                   {links.length === 0 && (
+                                     <div className="py-12 text-center border border-dashed border-border/40 rounded-xl bg-card/10">
+                                       <p className="text-muted-foreground/60 text-sm normal-case font-medium">No links added yet.</p>
+                                     </div>
+                                   )}
+                                </div>
+                             </SortableContext>
+                          </DndContext>
+                          
+                          <div className="mt-4 pt-6 border-t border-border/40">
+                             <h3 className="text-sm font-medium text-foreground mb-4 normal-case">Add New Link</h3>
+                             <LinkForm onLinkAdded={handleLinkAdded} />
+                          </div>
+                       </div>
+                    )}
+
+                    {activeTab === "projects" && (
+                       <div className="flex flex-col gap-6">
+                          <div className="flex items-center justify-between">
+                             <h2 className="text-lg font-semibold text-foreground">Featured Projects</h2>
+                             <span className="text-xs font-mono text-muted-foreground bg-foreground/5 px-2 py-1 rounded-md border border-border/40">{projects.length} Projects</span>
+                          </div>
+                          
+                          <DndContext id="projects-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleProjectDragEnd}>
+                             <SortableContext items={projects.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+                                <div className="flex flex-col gap-4">
+                                   {projects.map((project) => (
+                                      <ProjectCard key={project.id} project={project} onUpdate={handleProjectUpdated} onDelete={handleProjectDeleted} />
+                                   ))}
+                                   {projects.length === 0 && (
+                                     <div className="py-12 text-center border border-dashed border-border/40 rounded-xl bg-card/10">
+                                       <p className="text-muted-foreground/60 text-sm normal-case font-medium">No projects added yet.</p>
+                                     </div>
+                                   )}
+                                </div>
+                             </SortableContext>
+                          </DndContext>
+                          
+                          <div className="mt-4 pt-6 border-t border-border/40">
+                             <h3 className="text-sm font-medium text-foreground mb-4 normal-case">Add New Project</h3>
+                             <ProjectForm onProjectAdded={handleProjectAdded} />
+                          </div>
+                       </div>
+                    )}
+
+                    {activeTab === "profile" && (
+                       <div className="flex flex-col gap-10">
+                          <div>
+                             <h2 className="text-lg font-semibold text-foreground mb-6">Profile Settings</h2>
+                             <ProfileHeader username={user.username} bio={bio} avatarUrl={avatarUrl} onBioUpdate={setBio} />
+                          </div>
+                          
+                          <div className="border-t border-border/40 pt-8">
+                             <h2 className="text-lg font-semibold text-foreground mb-6">Developer Integrations</h2>
+                             <div className="flex flex-col gap-5 max-w-xl">
+                                <div className="flex flex-col gap-2">
+                                   <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">GitHub Username</label>
+                                   <input value={githubUsername} onChange={(e) => setGithubUsername(e.target.value)} placeholder="e.g. torvalds" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                   <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">LeetCode Username</label>
+                                   <input value={leetcodeUsername} onChange={(e) => setLeetcodeUsername(e.target.value)} placeholder="e.g. neetcode" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                   <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Dev.to Username</label>
+                                   <input value={devtoUsername} onChange={(e) => setDevtoUsername(e.target.value)} placeholder="e.g. ben" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="flex flex-col gap-2">
+                                     <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Medium</label>
+                                     <input value={mediumUsername} onChange={(e) => setMediumUsername(e.target.value)} placeholder="e.g. jdoe" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
+                                  </div>
+                                  <div className="flex flex-col gap-2">
+                                     <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Hashnode</label>
+                                     <input value={hashnodeUsername} onChange={(e) => setHashnodeUsername(e.target.value)} placeholder="e.g. jdoe" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
+                                  </div>
+                                </div>
+                             </div>
+                             <div className="mt-6">
+                                <button onClick={handleIntegrationSave} className="bg-foreground text-background px-6 py-2.5 rounded-md text-[10px] uppercase tracking-widest font-medium transition-colors hover:bg-foreground/90">
+                                   Save Integrations
+                                </button>
+                             </div>
+                          </div>
+                       </div>
+                    )}
+
+                    {activeTab === "appearance" && (
+                       <div>
+                          <h2 className="text-lg font-semibold text-foreground mb-6">Theme & Appearance</h2>
+                          <ThemePicker currentBackground={background} onBackgroundChange={setBackground} />
+                       </div>
+                    )}
+
+                    {activeTab === "seo" && (
+                       <div>
+                          <h2 className="text-lg font-semibold text-foreground mb-6">SEO & Social Sharing</h2>
+                          <div className="flex flex-col gap-5 max-w-xl">
+                             <div className="flex flex-col gap-2">
+                                <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Meta Title</label>
+                                <input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} placeholder="e.g. John Doe - Full-stack Engineer" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
+                             </div>
+                             <div className="flex flex-col gap-2">
+                                <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Meta Description</label>
+                                <textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} placeholder="e.g. Check out my latest articles and source code." className="w-full min-h-32 resize-none bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
+                             </div>
+                             <div className="mt-2">
+                                <button onClick={handleSeoSave} className="bg-foreground text-background px-6 py-2.5 rounded-md text-[10px] uppercase tracking-widest font-medium transition-colors hover:bg-foreground/90">
+                                   Save SEO Settings
+                                </button>
+                             </div>
+                          </div>
+                       </div>
+                    )}
+                 </motion.div>
+              </AnimatePresence>
+           </div>
+           </div>
         </div>
-      </main>
 
+
+      </main>
+      
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
