@@ -217,7 +217,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
         {/* 3. GITHUB CALENDAR (Spans 2 cols, fits right next to Identity on Desktop) */}
         {user.githubUsername && (
-          <div className="col-span-2 md:col-span-4 lg:col-span-2 p-6 sm:p-8 rounded-[2rem] bg-card/10 border border-border/40 backdrop-blur-sm overflow-hidden hover:border-border/80 transition-colors shadow-lg animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
+          <div className="col-span-2 md:col-span-4 lg:col-span-2 flex flex-col gap-2 overflow-hidden animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
              <div className="flex items-center gap-2 mb-6">
                 <IconBrandGithub size={18} className="text-muted-foreground" />
                 <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
@@ -232,7 +232,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
         {/* 4. STAT CARDS (1 col, 1 row each) */}
         {user.githubUsername && (
-           <div className="col-span-2 md:col-span-2 lg:col-span-1 p-6 rounded-[2rem] bg-card/10 border border-border/40 backdrop-blur-sm hover:border-border/80 transition-colors shadow-lg animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 fill-mode-both">
+           <div className="col-span-2 md:col-span-2 lg:col-span-1 flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 fill-mode-both">
               <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase border-b border-border/20 pb-3 mb-5">
                  GitHub
               </h2>
@@ -243,7 +243,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         )}
         
         {user.leetcodeUsername && (
-           <div className="col-span-2 md:col-span-2 lg:col-span-1 p-6 rounded-[2rem] bg-card/10 border border-border/40 backdrop-blur-sm hover:border-border/80 transition-colors shadow-lg animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 fill-mode-both">
+           <div className="col-span-2 md:col-span-2 lg:col-span-1 flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 fill-mode-both">
               <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase border-b border-border/20 pb-3 mb-5">
                  LeetCode
               </h2>
@@ -307,7 +307,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
         {/* 6. ARTICLES (Spans 2 cols) */}
         {(user.devtoUsername || user.mediumUsername || user.hashnodeUsername) && (
-           <div className="col-span-2 md:col-span-4 lg:col-span-2 p-6 sm:p-8 rounded-[2rem] bg-card/10 border border-border/40 backdrop-blur-sm hover:border-border/80 transition-colors shadow-lg animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-700 fill-mode-both">
+           <div className="col-span-2 md:col-span-4 lg:col-span-2 flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-700 fill-mode-both">
               <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase border-b border-border/20 pb-3 mb-6">
                  Latest Articles
               </h2>
