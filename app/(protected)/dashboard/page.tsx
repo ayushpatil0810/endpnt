@@ -2,8 +2,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/db/db";
-import { users, links, projects } from "@/db/schema/schema";
-import { eq, asc } from "drizzle-orm";
+import { users, links, projects, events } from "@/db/schema/schema";
+import { eq, asc, and, gte } from "drizzle-orm";
 import { DashboardClient } from "./dashboard-client";
 
 export default async function DashboardPage() {
@@ -36,12 +36,30 @@ export default async function DashboardPage() {
     .where(eq(projects.userId, session.user.id))
     .orderBy(asc(projects.displayOrder));
 
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const rawEvents = await db
+    .select({
+      type: events.type,
+      createdAt: events.createdAt,
+    })
+    .from(events)
+    .where(
+      and(
+        eq(events.userId, session.user.id),
+        gte(events.createdAt, thirtyDaysAgo)
+      )
+    );
+
   return (
     <DashboardClient
       user={userProfile}
       initialLinks={userLinks}
       initialProjects={userProjects}
+      initialEvents={rawEvents}
       authUser={{ name: session.user.name, image: session.user.image ?? null }}
     />
   );
 }
+

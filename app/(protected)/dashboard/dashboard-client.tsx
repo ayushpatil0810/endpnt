@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   useState,
   useCallback,
@@ -31,11 +32,16 @@ import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { ShareModal } from "@/components/ShareModal";
 import { ProjectCard } from "@/components/ProjectCard";
 import { ProjectForm } from "@/components/ProjectForm";
+import { LinksTab } from "./tabs/LinksTab";
+import { ProjectsTab } from "./tabs/ProjectsTab";
+import { ProfileTab } from "./tabs/ProfileTab";
+import { AppearanceTab } from "./tabs/AppearanceTab";
+import { SeoTab } from "./tabs/SeoTab";
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { User, Link as DbLink, Project } from "@/db/schema/schema";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import {
   IconSun,
   IconMoon,
@@ -57,6 +63,7 @@ interface DashboardClientProps {
   user: User;
   initialLinks: DbLink[];
   initialProjects: Project[];
+  initialEvents: { type: string; createdAt: Date }[];
   authUser: { name: string; image: string | null };
 }
 
@@ -109,6 +116,7 @@ export function DashboardClient({
   user,
   initialLinks,
   initialProjects,
+  initialEvents,
   authUser,
 }: DashboardClientProps) {
   const router = useRouter();
@@ -372,15 +380,15 @@ export function DashboardClient({
         <aside className="w-64 border-r border-border/40 bg-background flex-col pt-6 pb-6 overflow-y-auto hidden md:flex shrink-0">
           <div className="px-6 pb-6 mb-2 border-b border-border/20">
              <div className="flex items-center gap-3">
-                <div className="size-10 rounded-full border border-border/30 overflow-hidden bg-card/20 shrink-0">
-                   {avatarUrl ? (
-                     <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
-                   ) : (
-                     <div className="size-full flex items-center justify-center font-serif italic text-muted-foreground">
-                        {user.username.charAt(0).toUpperCase()}
-                     </div>
-                   )}
-                </div>
+                 <div className="size-10 rounded-full border border-border/30 overflow-hidden bg-card/20 shrink-0 relative">
+                    {avatarUrl ? (
+                      <Image src={avatarUrl} alt="Avatar" fill className="object-cover" sizes="40px" />
+                    ) : (
+                      <div className="size-full flex items-center justify-center font-serif italic text-muted-foreground">
+                         {user.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                 </div>
                 <div className="flex flex-col overflow-hidden">
                    <span className="text-sm font-semibold truncate text-foreground normal-case">{user.username}</span>
                    <span className="text-[10px] uppercase font-mono text-muted-foreground truncate">
@@ -423,7 +431,7 @@ export function DashboardClient({
         </aside>
 
         {/* Center Content Workspace */}
-        <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-8 relative hide-scrollbar">
+        <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-8 pb-24 md:pb-8 relative hide-scrollbar">
            <div className="w-full max-w-5xl mx-auto flex flex-col">
               {/* Hero Analytics Bar */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 shrink-0">
@@ -461,136 +469,64 @@ export function DashboardClient({
                     {activeTab === "analytics" && (
                        <div className="flex flex-col gap-6">
                           <h2 className="text-lg font-semibold text-foreground">Detailed Analytics</h2>
-                          <AnalyticsDashboard views={user.views ?? 0} links={links} />
+                          <AnalyticsDashboard views={user.views ?? 0} links={links} events={initialEvents} />
                        </div>
                     )}
 
                     {activeTab === "links" && (
-                       <div className="flex flex-col gap-6">
-                          <div className="flex items-center justify-between">
-                             <h2 className="text-lg font-semibold text-foreground">Manage Links</h2>
-                             <span className="text-xs font-mono text-muted-foreground bg-foreground/5 px-2 py-1 rounded-md border border-border/40">{links.length} Links</span>
-                          </div>
-                          
-                          <DndContext id="links-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                             <SortableContext items={links.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-                                <div className="flex flex-col gap-3">
-                                   {links.map((link) => (
-                                      <LinkCard key={link.id} link={link} onUpdate={handleLinkUpdated} onDelete={handleLinkDeleted} />
-                                   ))}
-                                   {links.length === 0 && (
-                                     <div className="py-12 text-center border border-dashed border-border/40 rounded-xl bg-card/10">
-                                       <p className="text-muted-foreground/60 text-sm normal-case font-medium">No links added yet.</p>
-                                     </div>
-                                   )}
-                                </div>
-                             </SortableContext>
-                          </DndContext>
-                          
-                          <div className="mt-4 pt-6 border-t border-border/40">
-                             <h3 className="text-sm font-medium text-foreground mb-4 normal-case">Add New Link</h3>
-                             <LinkForm onLinkAdded={handleLinkAdded} />
-                          </div>
-                       </div>
+                       <LinksTab 
+                         links={links} 
+                         sensors={sensors} 
+                         handleDragEnd={handleDragEnd} 
+                         handleLinkUpdated={handleLinkUpdated} 
+                         handleLinkDeleted={handleLinkDeleted} 
+                         handleLinkAdded={handleLinkAdded} 
+                       />
                     )}
 
                     {activeTab === "projects" && (
-                       <div className="flex flex-col gap-6">
-                          <div className="flex items-center justify-between">
-                             <h2 className="text-lg font-semibold text-foreground">Featured Projects</h2>
-                             <span className="text-xs font-mono text-muted-foreground bg-foreground/5 px-2 py-1 rounded-md border border-border/40">{projects.length} Projects</span>
-                          </div>
-                          
-                          <DndContext id="projects-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleProjectDragEnd}>
-                             <SortableContext items={projects.map((p) => p.id)} strategy={verticalListSortingStrategy}>
-                                <div className="flex flex-col gap-4">
-                                   {projects.map((project) => (
-                                      <ProjectCard key={project.id} project={project} onUpdate={handleProjectUpdated} onDelete={handleProjectDeleted} />
-                                   ))}
-                                   {projects.length === 0 && (
-                                     <div className="py-12 text-center border border-dashed border-border/40 rounded-xl bg-card/10">
-                                       <p className="text-muted-foreground/60 text-sm normal-case font-medium">No projects added yet.</p>
-                                     </div>
-                                   )}
-                                </div>
-                             </SortableContext>
-                          </DndContext>
-                          
-                          <div className="mt-4 pt-6 border-t border-border/40">
-                             <h3 className="text-sm font-medium text-foreground mb-4 normal-case">Add New Project</h3>
-                             <ProjectForm onProjectAdded={handleProjectAdded} />
-                          </div>
-                       </div>
+                       <ProjectsTab 
+                         projects={projects} 
+                         sensors={sensors} 
+                         handleProjectDragEnd={handleProjectDragEnd} 
+                         handleProjectUpdated={handleProjectUpdated} 
+                         handleProjectDeleted={handleProjectDeleted} 
+                         handleProjectAdded={handleProjectAdded} 
+                       />
                     )}
 
                     {activeTab === "profile" && (
-                       <div className="flex flex-col gap-10">
-                          <div>
-                             <h2 className="text-lg font-semibold text-foreground mb-6">Profile Settings</h2>
-                             <ProfileHeader username={user.username} bio={bio} avatarUrl={avatarUrl} onBioUpdate={setBio} />
-                          </div>
-                          
-                          <div className="border-t border-border/40 pt-8">
-                             <h2 className="text-lg font-semibold text-foreground mb-6">Developer Integrations</h2>
-                             <div className="flex flex-col gap-5 max-w-xl">
-                                <div className="flex flex-col gap-2">
-                                   <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">GitHub Username</label>
-                                   <input value={githubUsername} onChange={(e) => setGithubUsername(e.target.value)} placeholder="e.g. torvalds" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                   <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">LeetCode Username</label>
-                                   <input value={leetcodeUsername} onChange={(e) => setLeetcodeUsername(e.target.value)} placeholder="e.g. neetcode" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                   <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Dev.to Username</label>
-                                   <input value={devtoUsername} onChange={(e) => setDevtoUsername(e.target.value)} placeholder="e.g. ben" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="flex flex-col gap-2">
-                                     <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Medium</label>
-                                     <input value={mediumUsername} onChange={(e) => setMediumUsername(e.target.value)} placeholder="e.g. jdoe" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
-                                  </div>
-                                  <div className="flex flex-col gap-2">
-                                     <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Hashnode</label>
-                                     <input value={hashnodeUsername} onChange={(e) => setHashnodeUsername(e.target.value)} placeholder="e.g. jdoe" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
-                                  </div>
-                                </div>
-                             </div>
-                             <div className="mt-6">
-                                <button onClick={handleIntegrationSave} className="bg-foreground text-background px-6 py-2.5 rounded-md text-[10px] uppercase tracking-widest font-medium transition-colors hover:bg-foreground/90">
-                                   Save Integrations
-                                </button>
-                             </div>
-                          </div>
-                       </div>
+                       <ProfileTab 
+                         username={user.username} 
+                         bio={bio} 
+                         avatarUrl={avatarUrl} 
+                         setBio={setBio} 
+                         githubUsername={githubUsername} 
+                         setGithubUsername={setGithubUsername} 
+                         leetcodeUsername={leetcodeUsername} 
+                         setLeetcodeUsername={setLeetcodeUsername} 
+                         devtoUsername={devtoUsername} 
+                         setDevtoUsername={setDevtoUsername} 
+                         mediumUsername={mediumUsername} 
+                         setMediumUsername={setMediumUsername} 
+                         hashnodeUsername={hashnodeUsername} 
+                         setHashnodeUsername={setHashnodeUsername} 
+                         handleIntegrationSave={handleIntegrationSave} 
+                       />
                     )}
 
                     {activeTab === "appearance" && (
-                       <div>
-                          <h2 className="text-lg font-semibold text-foreground mb-6">Theme & Appearance</h2>
-                          <ThemePicker currentBackground={background} onBackgroundChange={setBackground} />
-                       </div>
+                       <AppearanceTab background={background} setBackground={setBackground} />
                     )}
 
                     {activeTab === "seo" && (
-                       <div>
-                          <h2 className="text-lg font-semibold text-foreground mb-6">SEO & Social Sharing</h2>
-                          <div className="flex flex-col gap-5 max-w-xl">
-                             <div className="flex flex-col gap-2">
-                                <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Meta Title</label>
-                                <input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} placeholder="e.g. John Doe - Full-stack Engineer" className="w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
-                             </div>
-                             <div className="flex flex-col gap-2">
-                                <label className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground ml-1">Meta Description</label>
-                                <textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} placeholder="e.g. Check out my latest articles and source code." className="w-full min-h-32 resize-none bg-card/20 border border-border/60 hover:border-foreground/40 rounded-md px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case" />
-                             </div>
-                             <div className="mt-2">
-                                <button onClick={handleSeoSave} className="bg-foreground text-background px-6 py-2.5 rounded-md text-[10px] uppercase tracking-widest font-medium transition-colors hover:bg-foreground/90">
-                                   Save SEO Settings
-                                </button>
-                             </div>
-                          </div>
-                       </div>
+                       <SeoTab 
+                         seoTitle={seoTitle} 
+                         setSeoTitle={setSeoTitle} 
+                         seoDescription={seoDescription} 
+                         setSeoDescription={setSeoDescription} 
+                         handleSeoSave={handleSeoSave} 
+                       />
                     )}
                  </motion.div>
               </AnimatePresence>
@@ -600,6 +536,28 @@ export function DashboardClient({
 
 
       </main>
+
+      {/* Mobile Bottom Nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t border-border/40 bg-background/80 backdrop-blur-md z-40 px-2 py-2 pb-6">
+        <div className="flex items-center justify-around">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors ${
+                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon size={20} stroke={isActive ? 2 : 1.5} />
+                <span className="text-[9px] font-medium">{tab.label.split(" ")[0]}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
       
       <ShareModal
         isOpen={isShareModalOpen}

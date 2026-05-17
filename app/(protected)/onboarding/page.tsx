@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { IconCheck, IconX, IconLoader2, IconArrowRight } from "@tabler/icons-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { IconCheck, IconX, IconLoader2, IconPencil } from "@tabler/icons-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 interface ProfileHeaderProps {
   username: string;
@@ -77,6 +77,7 @@ export function ProfileHeader({
               onClick={() => setEditing(true)}
               className="text-muted-foreground hover:text-foreground transition-colors p-2"
               title="Edit Profile"
+              aria-label="Edit Profile"
             >
               <IconPencil size={18} stroke={1.5} />
             </button>

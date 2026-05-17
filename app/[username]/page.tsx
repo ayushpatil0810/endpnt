@@ -7,11 +7,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, cache } from "react";
 import { PublicLinkButton } from "./public-link-button";
-import { GithubStats } from "@/components/github-stats";
+import { GithubStats } from "@/components/GithubStats";
 import { LeetcodeStats } from "@/components/leetcode-stats";
-import { DevtoPosts } from "@/components/devto-posts";
+import { DevtoPosts } from "@/components/DevToPosts";
 import { GithubCalendar } from "@/components/github-calendar";
-import { BlogPosts } from "@/components/blog-posts";
+import { BlogPosts } from "@/components/BlogPosts";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ViewTracker } from "@/components/ViewTracker";
 import {
   GithubStatsSkeleton,
@@ -65,7 +66,7 @@ export async function generateMetadata({
       title,
       description,
       type: "profile",
-      url: `https://endpnt.dev/${user.username}`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL || "https://endpnt.dev"}/${user.username}`,
       images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
     },
     twitter: {
@@ -229,9 +230,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   Contributions
                 </h2>
              </div>
-             <Suspense fallback={<GithubCalendarSkeleton />}>
-               <GithubCalendar username={user.githubUsername} />
-             </Suspense>
+             <ErrorBoundary fallbackMessage="Failed to load GitHub calendar">
+               <Suspense fallback={<GithubCalendarSkeleton />}>
+                 <GithubCalendar username={user.githubUsername} />
+               </Suspense>
+             </ErrorBoundary>
           </div>
         )}
 
@@ -241,9 +244,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase border-b border-border/20 pb-3 mb-5">
                  GitHub
               </h2>
-              <Suspense fallback={<GithubStatsSkeleton />}>
-                 <GithubStats username={user.githubUsername} />
-              </Suspense>
+              <ErrorBoundary fallbackMessage="Failed to load GitHub stats">
+                <Suspense fallback={<GithubStatsSkeleton />}>
+                   <GithubStats username={user.githubUsername} />
+                </Suspense>
+              </ErrorBoundary>
            </div>
         )}
         
@@ -252,9 +257,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <h2 className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase border-b border-border/20 pb-3 mb-5">
                  LeetCode
               </h2>
-              <Suspense fallback={<LeetcodeStatsSkeleton />}>
-                <LeetcodeStats username={user.leetcodeUsername} />
-              </Suspense>
+              <ErrorBoundary fallbackMessage="Failed to load LeetCode stats">
+                <Suspense fallback={<LeetcodeStatsSkeleton />}>
+                  <LeetcodeStats username={user.leetcodeUsername} />
+                </Suspense>
+              </ErrorBoundary>
            </div>
         )}
 
@@ -318,14 +325,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </h2>
               <div className="flex flex-col gap-6">
                  {user.devtoUsername && (
-                    <Suspense fallback={<DevtoPostsSkeleton />}>
-                       <DevtoPosts username={user.devtoUsername} />
-                    </Suspense>
+                    <ErrorBoundary fallbackMessage="Failed to load Dev.to posts">
+                      <Suspense fallback={<DevtoPostsSkeleton />}>
+                         <DevtoPosts username={user.devtoUsername} />
+                      </Suspense>
+                    </ErrorBoundary>
                  )}
                  {(user.mediumUsername || user.hashnodeUsername) && (
-                    <Suspense fallback={<BlogPostsSkeleton />}>
-                       <BlogPosts mediumUsername={user.mediumUsername ?? undefined} hashnodeUsername={user.hashnodeUsername ?? undefined} />
-                    </Suspense>
+                    <ErrorBoundary fallbackMessage="Failed to load blog posts">
+                      <Suspense fallback={<BlogPostsSkeleton />}>
+                         <BlogPosts mediumUsername={user.mediumUsername ?? undefined} hashnodeUsername={user.hashnodeUsername ?? undefined} />
+                      </Suspense>
+                    </ErrorBoundary>
                  )}
               </div>
            </div>

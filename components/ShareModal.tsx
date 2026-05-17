@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import QRCode from "react-qr-code";
 import { IconX, IconDownload, IconShare } from "@tabler/icons-react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -91,6 +91,7 @@ export function ShareModal({ isOpen, onClose, profileUrl, username }: ShareModal
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Close modal"
             >
               <IconX size={20} />
             </button>

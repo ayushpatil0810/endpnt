@@ -3,6 +3,11 @@ import { auth } from "@/lib/auth";
 
 const protectedRoutes = ["/dashboard", "/onboarding"];
 
+/**
+ * Next.js 16+ Proxy
+ * Note: 'middleware.ts' was deprecated and renamed to 'proxy.ts' in Next.js 16.
+ * This file handles authentication and routing logic before requests complete.
+ */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isProtected = protectedRoutes.some((route) =>

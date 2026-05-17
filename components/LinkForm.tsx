@@ -4,7 +4,7 @@ import { useState } from "react";
 import { IconLoader2, IconX, IconPlus, IconLink } from "@tabler/icons-react";
 import { toast } from "sonner";
 import type { Link as DbLink } from "@/db/schema/schema";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { LinkIcon } from "./LinkIcon";
 
 interface LinkFormProps {

@@ -4,7 +4,7 @@ import { signIn } from "@/lib/auth-client";
 import { IconBrandGithub, IconArrowRight, IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 export default function SignInPage() {
   const [loading, setLoading] = useState(false);

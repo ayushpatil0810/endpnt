@@ -1,9 +1,9 @@
 "use client";
 
 import { signIn, useSession } from "@/lib/auth-client";
-import { IconBrandGithub, IconArrowRight, IconBolt, IconLink, IconChartBar, IconPalette, IconCheck } from "@tabler/icons-react";
+import { IconBrandGithub, IconBolt, IconLink, IconChartBar, IconPalette } from "@tabler/icons-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { NoiseBackground } from "@/components/ui/noise-background";
 import DecryptedText from "@/components/ui/decrypted-text";
 import PixelSnow from "@/components/PixelSnow";
@@ -35,23 +35,7 @@ const FEATURES = [
   }
 ];
 
-const TESTIMONIALS = [
-  {
-    quote: "I deleted my custom Next.js portfolio. ENDPNT is cleaner, faster to update, and actually gives me analytics on who clicks my projects.",
-    author: "Sarah J.",
-    role: "Frontend Engineer"
-  },
-  {
-    quote: "Finally, a link tool that actually connects to my GitHub. This is a must-have for indie hackers. Set it up in 2 mins.",
-    author: "David M.",
-    role: "Full-Stack Dev"
-  },
-  {
-    quote: "The click analytics made me realize my resume link was broken for weeks. This is genuinely so useful.",
-    author: "Alex K.",
-    role: "Software Engineer"
-  }
-];
+
 
 export default function LandingPage() {
   const { data: session, isPending } = useSession();
@@ -349,38 +333,7 @@ export default function LandingPage() {
           </div>
         </motion.section>
 
-        {/* ── Social Proof ── */}
-        {/*
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1 }}
-          className="w-full max-w-[1600px] mx-auto px-6 sm:px-16 lg:px-32 py-16 sm:py-24 border-y border-white/5 bg-white/[0.01]"
-        >
-           <div className="flex flex-col items-center gap-12">
-            <div className="flex items-center gap-2 text-white/50 text-sm font-mono uppercase tracking-widest">
-              <IconCheck size={16} className="text-green-400" />
-              Trusted by 2,500+ builders, hackers, and engineers.
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {TESTIMONIALS.map((t, i) => (
-                <div key={i} className="flex flex-col gap-4 p-6 border border-white/5 bg-black/50 rounded-xl">
-                  <p className="text-white/70 text-sm leading-relaxed italic">"{t.quote}"</p>
-                  <div className="mt-auto pt-4 border-t border-white/10 flex items-center gap-3">
-                    <div className="size-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white/50 uppercase">{t.author[0]}</div>
-                    <div className="flex flex-col">
-                      <span className="text-white text-xs font-bold">{t.author}</span>
-                      <span className="text-white/40 text-[10px] font-mono">{t.role}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-           </div>
-        </motion.section>
-        */}
+
 
         {/* ── How It Works ── */}
         <motion.section
