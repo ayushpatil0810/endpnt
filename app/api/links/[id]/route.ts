@@ -4,6 +4,7 @@ import { db } from "@/db/db";
 import { links } from "@/db/schema/schema";
 import { eq, and } from "drizzle-orm";
 import { isUrlSafe } from "@/lib/security";
+import { UpdateLinkSchema } from "@/lib/validators";
 
 export async function PATCH(
   request: NextRequest,
@@ -14,7 +15,16 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await request.json();
-  const { title, url, display_order } = body;
+
+  const parsed = UpdateLinkSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
+
+  const { title, url, display_order } = parsed.data;
 
   const updateData: Record<string, unknown> = {};
   if (title !== undefined) updateData.title = title;
@@ -60,3 +70,4 @@ export async function DELETE(
 
   return NextResponse.json({ success: true });
 }
+

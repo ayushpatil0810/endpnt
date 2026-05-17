@@ -4,6 +4,7 @@ import { db } from "@/db/db";
 import { users } from "@/db/schema/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { UpdateProfileSchema } from "@/lib/validators";
 
 export async function GET(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -24,7 +25,19 @@ export async function PATCH(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { bio, theme, background, githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername, seoTitle, seoDescription } = body;
+  const parsed = UpdateProfileSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
+
+  const {
+    bio, theme, background,
+    githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername,
+    seoTitle, seoDescription,
+  } = parsed.data;
 
   const updateData: Record<string, unknown> = {};
   if (bio !== undefined) updateData.bio = bio;
@@ -50,3 +63,4 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json(updated);
 }
+

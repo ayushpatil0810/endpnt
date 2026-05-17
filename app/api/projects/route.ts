@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db/db";
 import { projects } from "@/db/schema/schema";
 import { eq, asc } from "drizzle-orm";
+import { CreateProjectSchema } from "@/lib/validators";
 
 export async function GET(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -22,11 +23,15 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { title, description, liveUrl, githubUrl, techStack } = body;
-
-  if (!title?.trim()) {
-    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  const parsed = CreateProjectSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
   }
+
+  const { title, description, liveUrl, githubUrl, techStack } = parsed.data;
 
   // Get current max display_order
   const existing = await db
@@ -52,3 +57,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(newProject, { status: 201 });
 }
+

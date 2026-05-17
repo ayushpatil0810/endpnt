@@ -4,6 +4,7 @@ import { db } from "@/db/db";
 import { links, users } from "@/db/schema/schema";
 import { eq, asc } from "drizzle-orm";
 import { isUrlSafe } from "@/lib/security";
+import { CreateLinkSchema } from "@/lib/validators";
 
 export async function GET(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -34,11 +35,15 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { title, url } = body;
-
-  if (!title || !url) {
-    return NextResponse.json({ error: "Title and URL are required" }, { status: 400 });
+  const parsed = CreateLinkSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
   }
+
+  const { title, url } = parsed.data;
 
   const safe = await isUrlSafe(url);
   if (!safe) {
@@ -66,3 +71,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(newLink, { status: 201 });
 }
+

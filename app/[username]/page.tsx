@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import { PublicLinkButton } from "./public-link-button";
 import { GithubStats } from "@/components/github-stats";
 import { LeetcodeStats } from "@/components/leetcode-stats";
@@ -28,16 +28,26 @@ interface ProfilePageProps {
 
 export const revalidate = 60; // Cache page for 60 seconds (ISR)
 
-export async function generateMetadata({
-  params,
-}: ProfilePageProps): Promise<Metadata> {
-  const { username } = await params;
-
+/**
+ * Cached per-request user lookup.
+ * React's cache() deduplicates calls with the same argument within one
+ * render pass, so generateMetadata and ProfilePage both calling this
+ * function will only produce a single DB query.
+ */
+const getUserByUsername = cache(async (username: string) => {
   const [user] = await db
     .select()
     .from(users)
     .where(eq(users.username, username))
     .limit(1);
+  return user ?? null;
+});
+
+export async function generateMetadata({
+  params,
+}: ProfilePageProps): Promise<Metadata> {
+  const { username } = await params;
+  const user = await getUserByUsername(username);
 
   if (!user) return { title: "Not Found" };
 
@@ -69,12 +79,7 @@ export async function generateMetadata({
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params;
-
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username))
-    .limit(1);
+  const user = await getUserByUsername(username);
 
   if (!user) notFound();
 
