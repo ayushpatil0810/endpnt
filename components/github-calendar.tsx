@@ -35,6 +35,7 @@ export function GithubCalendar({ username }: { username: string }) {
         fontSize={12}
         blockSize={14}
         blockMargin={4}
+        throwOnError={true}
       />
     </div>
   );

@@ -11,6 +11,9 @@ const LeetCodeIcon = () => (
   </svg>
 );
 
+const formatNumber = (num: number) => 
+  Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num || 0);
+
 export async function LeetcodeStats({ username }: { username: string }) {
   if (!username) return null;
 
@@ -48,29 +51,29 @@ export async function LeetcodeStats({ username }: { username: string }) {
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-2 mt-2 z-10">
-        <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
-          <span className="text-lg font-bold text-foreground">
-            {data.solvedProblem || 0}
-          </span>
-          <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
+      <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border/10 w-full z-10">
+        <div className="flex items-center justify-between w-full">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
             Solved
           </span>
-        </div>
-        <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
-          <span className="text-lg font-bold text-emerald-400">
-            {data.easySolved || 0}
+          <span className="text-sm font-bold text-foreground">
+            {formatNumber(data.solvedProblem || 0)}
           </span>
-          <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        </div>
+        <div className="flex items-center justify-between w-full">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
             Easy
           </span>
-        </div>
-        <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
-          <span className="text-lg font-bold text-amber-500">
-            {data.mediumSolved || 0}
+          <span className="text-sm font-bold text-emerald-400">
+            {formatNumber(data.easySolved || 0)}
           </span>
-          <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        </div>
+        <div className="flex items-center justify-between w-full">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
             Medium
+          </span>
+          <span className="text-sm font-bold text-amber-500">
+            {formatNumber(data.mediumSolved || 0)}
           </span>
         </div>
       </div>

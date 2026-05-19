@@ -29,8 +29,8 @@ export const UpdateProjectSchema = CreateProjectSchema.partial();
 
 export const UpdateProfileSchema = z.object({
   bio: z.string().max(300, "Bio must be 300 characters or fewer").optional(),
-  theme: z.string().max(50).optional(),
-  background: z.string().max(100).optional(),
+  theme: z.enum(["glassmorphism", "neo-brutalism", "neumorphism", "claymorphism"]).optional(),
+  layout: z.string().optional(),
   githubUsername: z.string().max(39).optional(),
   leetcodeUsername: z.string().max(100).optional(),
   devtoUsername: z.string().max(100).optional(),

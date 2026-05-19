@@ -4,6 +4,7 @@ import { useState } from "react";
 import { IconLoader2, IconPlus, IconX } from "@tabler/icons-react";
 import { toast } from "sonner";
 import type { Project } from "@/db/schema/schema";
+import { isValidUrlString } from "./LinkForm";
 
 interface ProjectFormProps {
   onProjectAdded: (project: Project) => void;
@@ -30,9 +31,13 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
     setOpen(false);
   }
 
+  const isLiveUrlValid = isValidUrlString(liveUrl);
+  const isGithubUrlValid = isValidUrlString(githubUrl);
+  const isFormValid = !!title.trim() && isLiveUrlValid && isGithubUrlValid;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!isFormValid) return;
     setSaving(true);
 
     const techStack = techInput
@@ -115,20 +120,30 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <input
-          type="text"
-          value={liveUrl}
-          onChange={(e) => setLiveUrl(e.target.value)}
-          placeholder="Live URL (optional)"
-          className={INPUT_CLASS}
-        />
-        <input
-          type="text"
-          value={githubUrl}
-          onChange={(e) => setGithubUrl(e.target.value)}
-          placeholder="GitHub URL (optional)"
-          className={INPUT_CLASS}
-        />
+        <div className="flex flex-col gap-1 w-full relative">
+          <input
+            type="text"
+            value={liveUrl}
+            onChange={(e) => setLiveUrl(e.target.value)}
+            placeholder="Live URL (optional)"
+            className={INPUT_CLASS}
+          />
+          {!isLiveUrlValid && liveUrl.trim().length > 0 && (
+            <span className="text-[10px] text-destructive px-1 absolute -bottom-4">Invalid URL</span>
+          )}
+        </div>
+        <div className="flex flex-col gap-1 w-full relative">
+          <input
+            type="text"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="GitHub URL (optional)"
+            className={INPUT_CLASS}
+          />
+          {!isGithubUrlValid && githubUrl.trim().length > 0 && (
+            <span className="text-[10px] text-destructive px-1 absolute -bottom-4">Invalid URL</span>
+          )}
+        </div>
       </div>
 
       <input
@@ -139,10 +154,10 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
         className={INPUT_CLASS}
       />
 
-      <div className="flex items-center gap-4 mt-1">
+      <div className="flex items-center gap-4 mt-3">
         <button
           type="submit"
-          disabled={saving || !title.trim()}
+          disabled={saving || !isFormValid}
           className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
         >
           {saving ? <IconLoader2 size={12} className="animate-spin" /> : <IconPlus size={12} />}

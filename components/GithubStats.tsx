@@ -1,5 +1,8 @@
 import { IconBrandGithub } from "@tabler/icons-react";
 
+const formatNumber = (num: number) => 
+  Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num || 0);
+
 export async function GithubStats({ username }: { username: string }) {
   if (!username) return null;
 
@@ -32,29 +35,29 @@ export async function GithubStats({ username }: { username: string }) {
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-2 mt-2">
-        <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
-          <span className="text-lg font-bold text-foreground">
-            {data.public_repos || 0}
-          </span>
-          <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
+      <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border/10 w-full">
+        <div className="flex items-center justify-between w-full">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
             Repos
           </span>
-        </div>
-        <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
-          <span className="text-lg font-bold text-foreground">
-            {data.followers || 0}
+          <span className="text-sm font-bold text-foreground">
+            {formatNumber(data.public_repos || 0)}
           </span>
-          <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        </div>
+        <div className="flex items-center justify-between w-full">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
             Followers
           </span>
-        </div>
-        <div className="flex flex-col items-center justify-center p-3 rounded-none bg-card/20 border border-border/20">
-          <span className="text-lg font-bold text-foreground">
-            {data.following || 0}
+          <span className="text-sm font-bold text-foreground">
+            {formatNumber(data.followers || 0)}
           </span>
-          <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        </div>
+        <div className="flex items-center justify-between w-full">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
             Following
+          </span>
+          <span className="text-sm font-bold text-foreground">
+            {formatNumber(data.following || 0)}
           </span>
         </div>
       </div>

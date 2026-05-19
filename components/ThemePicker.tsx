@@ -2,114 +2,206 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { IconCheck, IconPalette } from "@tabler/icons-react";
+import { IconCheck, IconLoader2 } from "@tabler/icons-react";
+import { THEMES, type ThemeId } from "@/lib/themes";
+import { cn } from "@/lib/utils";
 
 interface ThemePickerProps {
-  currentBackground: string;
-  onBackgroundChange: (bg: string) => void;
+  currentTheme: ThemeId | string;
+  onThemeChange: (theme: ThemeId) => void;
 }
 
-const BACKGROUND_PRESETS = [
-  { id: "aurora", name: "Aurora", style: { background: "linear-gradient(135deg, rgba(80, 20, 147, 0.4), transparent, rgba(0, 155, 155, 0.4))" } },
-  { id: "grid", name: "Grid", style: { backgroundImage: 'linear-gradient(to right, #ffffff15 1px, transparent 1px), linear-gradient(to bottom, #ffffff15 1px, transparent 1px)', backgroundSize: '1rem 1rem' } },
-  { id: "dots", name: "Dots", style: { backgroundImage: 'radial-gradient(#ffffff25 1px, transparent 1px)', backgroundSize: '1rem 1rem' } },
-  { id: "solid:#0a0a0a", name: "Solid Dark", style: { background: "#0a0a0a" } },
-  { id: "gradient:linear-gradient(135deg,#09203F,#537895)", name: "Deep Space", style: { background: "linear-gradient(135deg, #09203F, #537895)" } },
-  { id: "gradient:linear-gradient(to right,#434343, #000000)", name: "Carbon", style: { background: "linear-gradient(to right, #434343, #000000)" } },
-] as const;
+const THEME_PREVIEW_STYLES: Record<string, React.CSSProperties> = {
+  glassmorphism: {
+    background: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #0d1b2a 100%)",
+  },
+  "neo-brutalism": {
+    background: "#f5f0e8",
+  },
+  neumorphism: {
+    background: "#e0e5ec",
+  },
+  claymorphism: {
+    background: "linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #ede9fe 100%)",
+  },
+};
 
-export function ThemePicker({ currentBackground, onBackgroundChange }: ThemePickerProps) {
+const THEME_CARD_PREVIEWS: Record<string, React.CSSProperties> = {
+  glassmorphism: {
+    background: "rgba(255,255,255,0.07)",
+    border: "1px solid rgba(255,255,255,0.15)",
+    borderRadius: "10px",
+    backdropFilter: "blur(8px)",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+  },
+  "neo-brutalism": {
+    background: "#ffffff",
+    border: "2.5px solid #1a1a1a",
+    borderRadius: "0px",
+    boxShadow: "4px 4px 0px #1a1a1a",
+  },
+  neumorphism: {
+    background: "#e0e5ec",
+    border: "none",
+    borderRadius: "10px",
+    boxShadow: "5px 5px 10px #b8bec7, -5px -5px 10px #ffffff",
+  },
+  claymorphism: {
+    background: "#ffffff",
+    border: "2px solid rgba(255,255,255,0.9)",
+    borderRadius: "14px",
+    boxShadow: "0 5px 0px #d4b8e0, 0 8px 16px rgba(180,140,220,0.25)",
+  },
+};
+
+const THEME_TEXT_COLORS: Record<string, string> = {
+  glassmorphism: "rgba(255,255,255,0.9)",
+  "neo-brutalism": "#1a1a1a",
+  neumorphism: "#3a4a5e",
+  claymorphism: "#2d1b69",
+};
+
+const THEME_MUTED_COLORS: Record<string, string> = {
+  glassmorphism: "rgba(255,255,255,0.45)",
+  "neo-brutalism": "#555555",
+  neumorphism: "#7a8a9e",
+  claymorphism: "#7c5cbf",
+};
+
+export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
   const [saving, setSaving] = useState(false);
 
-  const handleUpdate = async (value: string) => {
+  const handleUpdate = async (themeId: ThemeId) => {
+    if (themeId === currentTheme) return;
     setSaving(true);
-    
-    // Optimistic UI
-    onBackgroundChange(value);
+    onThemeChange(themeId); // optimistic
 
     try {
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ background: value }),
+        body: JSON.stringify({ theme: themeId }),
       });
       if (!res.ok) throw new Error("Sync failed");
+      toast.success("Theme updated!");
     } catch {
-      toast.error("Failed to update design.");
+      toast.error("Failed to update theme.");
     } finally {
       setSaving(false);
     }
   };
 
-  const isCustomColor = currentBackground?.startsWith("#");
-
   return (
-    <div className="flex flex-col gap-12">
-      {/* Background Section */}
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between border-b border-border/40 pb-4">
-          <h2 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground font-medium">Background Style</h2>
-          {saving && (
-            <span className="text-[10px] uppercase font-mono tracking-widest text-foreground animate-pulse">Syncing</span>
-          )}
+    <div className="flex flex-col gap-8">
+      <div className="flex items-center justify-between border-b border-border/40 pb-4">
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Profile Theme</h2>
+          <p className="text-[11px] text-muted-foreground mt-0.5 font-mono uppercase tracking-wider">
+            Choose a style for your public profile page
+          </p>
         </div>
-        
-        <div className="grid grid-cols-3 gap-4">
-          {BACKGROUND_PRESETS.map((preset) => {
-            const isActive = currentBackground === preset.id;
-            return (
-              <button
-                key={preset.id}
-                onClick={() => handleUpdate(preset.id)}
-                className={`group flex flex-col items-center gap-2 p-2 rounded-none border transition-all ${
-                  isActive ? "border-foreground bg-foreground/5 shadow-md" : "border-border/60 hover:border-foreground/40 bg-card/20"
-                }`}
-              >
-                <div 
-                  className={`w-full aspect-square rounded-none border border-border/40 relative flex items-center justify-center overflow-hidden bg-[#0a0a0a]`}
-                  style={preset.style}
-                >
-                  {isActive && (
-                    <div className="absolute top-1 right-1 bg-foreground text-background rounded-full p-0.5 shadow-sm">
-                      <IconCheck size={10} stroke={3} />
-                    </div>
-                  )}
-                </div>
-                <div className="text-[10px] font-medium tracking-wide text-muted-foreground group-hover:text-foreground transition-colors uppercase">
-                  {preset.name}
-                </div>
-              </button>
-            );
-          })}
+        {saving && (
+          <span className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-widest text-muted-foreground animate-pulse">
+            <IconLoader2 size={12} className="animate-spin" />
+            Saving
+          </span>
+        )}
+      </div>
 
-          {/* Custom Color Selector */}
-          <label
-            className={`cursor-pointer group flex flex-col items-center gap-2 p-2 rounded-none border transition-all ${
-              isCustomColor ? "border-foreground bg-foreground/5 shadow-md" : "border-border/60 hover:border-foreground/40 bg-card/20"
-            }`}
-          >
-            <div 
-              className="w-full aspect-square rounded-none border border-border/40 relative flex items-center justify-center overflow-hidden bg-[#0a0a0a] transition-colors"
-              style={{ backgroundColor: isCustomColor ? currentBackground : undefined }}
-            >
-              <input 
-                type="color" 
-                value={isCustomColor ? currentBackground : "#000000"}
-                onChange={(e) => handleUpdate(e.target.value)}
-                className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
-              />
-              {!isCustomColor && <IconPalette size={20} className="text-muted-foreground group-hover:text-foreground opacity-50" />}
-              {isCustomColor && (
-                <div className="absolute top-1 right-1 bg-foreground text-background rounded-full p-0.5 shadow-sm">
-                  <IconCheck size={10} stroke={3} />
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {THEMES.map((theme) => {
+          const isActive = currentTheme === theme.id;
+          const bgStyle = THEME_PREVIEW_STYLES[theme.id];
+          const cardStyle = THEME_CARD_PREVIEWS[theme.id];
+          const textColor = THEME_TEXT_COLORS[theme.id];
+          const mutedColor = THEME_MUTED_COLORS[theme.id];
+
+          return (
+            <button
+              key={theme.id}
+              onClick={() => handleUpdate(theme.id as ThemeId)}
+              className={cn(
+                "group relative flex flex-col gap-4 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer text-left",
+                isActive
+                  ? "border-foreground bg-foreground/5 shadow-md"
+                  : "border-border/50 hover:border-foreground/50 bg-card/10"
               )}
-            </div>
-            <div className="text-[10px] font-medium tracking-wide text-muted-foreground group-hover:text-foreground transition-colors uppercase">
-               Custom Color
-            </div>
-          </label>
-        </div>
+            >
+              {/* Mini Preview */}
+              <div
+                className="w-full h-28 rounded-lg overflow-hidden flex items-center justify-center relative shadow-sm"
+                style={bgStyle}
+              >
+                {/* Active badge */}
+                {isActive && (
+                  <div className="absolute top-2 right-2 flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-0.5 z-20 shadow-md">
+                    <IconCheck size={10} stroke={3} />
+                    <span className="text-[9px] font-bold uppercase tracking-wider">Active</span>
+                  </div>
+                )}
+                {/* Mini "card" inside preview */}
+                <div
+                  className="w-3/4 px-3 py-2.5 flex flex-col gap-1.5"
+                  style={cardStyle}
+                >
+                  {/* Avatar + name row */}
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="size-5 rounded-full shrink-0"
+                      style={{
+                        background: theme.previewColors[2] ?? "#888",
+                        border: theme.id === "neo-brutalism" ? "1.5px solid #1a1a1a" : "none",
+                      }}
+                    />
+                    <div className="flex flex-col gap-0.5">
+                      <div
+                        className="h-1.5 rounded-full w-14"
+                        style={{ background: textColor, opacity: 0.8 }}
+                      />
+                      <div
+                        className="h-1 rounded-full w-10"
+                        style={{ background: mutedColor }}
+                      />
+                    </div>
+                  </div>
+                  {/* Content lines */}
+                  <div
+                    className="h-px w-full mt-0.5"
+                    style={{ background: mutedColor, opacity: 0.4 }}
+                  />
+                  <div className="flex flex-col gap-1 mt-0.5">
+                    <div
+                      className="h-1 rounded-full w-full"
+                      style={{ background: mutedColor, opacity: 0.5 }}
+                    />
+                    <div
+                      className="h-1 rounded-full w-3/4"
+                      style={{ background: mutedColor, opacity: 0.35 }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Theme info */}
+              <div className="flex flex-col gap-1.5 z-10 w-full">
+                <div className="flex items-center gap-2 w-full">
+                  <span className="text-sm font-semibold text-foreground">{theme.name}</span>
+                  {/* Color dots */}
+                  <div className="flex gap-1 ml-auto">
+                    {theme.previewColors.map((c, i) => (
+                      <div
+                        key={i}
+                        className="size-3 rounded-full border border-border/30"
+                        style={{ background: c }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">{theme.description}</p>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

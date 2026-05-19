@@ -34,7 +34,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const {
-    bio, theme, background,
+    bio, theme, layout,
     githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername,
     seoTitle, seoDescription,
   } = parsed.data;
@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest) {
   const updateData: Record<string, unknown> = {};
   if (bio !== undefined) updateData.bio = bio;
   if (theme !== undefined) updateData.theme = theme;
-  if (background !== undefined) updateData.background = background;
+  if (layout !== undefined) updateData.layout = layout;
   if (githubUsername !== undefined) updateData.githubUsername = githubUsername === "" ? null : githubUsername;
   if (leetcodeUsername !== undefined) updateData.leetcodeUsername = leetcodeUsername === "" ? null : leetcodeUsername;
   if (devtoUsername !== undefined) updateData.devtoUsername = devtoUsername === "" ? null : devtoUsername;

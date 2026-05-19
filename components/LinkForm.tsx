@@ -21,7 +21,19 @@ const PRESETS = [
   { title: "Telegram", url: "https://t.me/" },
   { title: "WhatsApp", url: "https://wa.me/" },
   { title: "Email", url: "mailto:" },
+  { title: "Email", url: "mailto:" },
 ];
+
+const URL_REGEX = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
+const EMAIL_REGEX = /^mailto:.+@.+\..+/i;
+const PHONE_REGEX = /^tel:[\d\+\-\(\)\s]+$/;
+
+export function isValidUrlString(val: string) {
+  if (!val.trim()) return true;
+  if (val.startsWith("mailto:")) return EMAIL_REGEX.test(val);
+  if (val.startsWith("tel:")) return PHONE_REGEX.test(val);
+  return URL_REGEX.test(val);
+}
 
 export function LinkForm({ onLinkAdded }: LinkFormProps) {
   const [open, setOpen] = useState(false);
@@ -29,6 +41,8 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const isUrlValid = isValidUrlString(url);
 
   function reset() {
     setTitle("");
@@ -50,7 +64,7 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim() || !url.trim()) return;
+    if (!title.trim() || !url.trim() || !isUrlValid) return;
 
     // Auto-prepend https if missing (unless it's mailto: or similar)
     const normalizedUrl =
@@ -208,12 +222,17 @@ export function LinkForm({ onLinkAdded }: LinkFormProps) {
                       Enter your email address after the colon.
                     </span>
                   )}
+                  {!isUrlValid && url.trim().length > 0 && url !== "mailto:" && url !== "tel:" && (
+                    <span className="text-[10px] text-destructive absolute -bottom-5 left-0">
+                      Please enter a valid URL.
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
                   <button
                     type="submit"
-                    disabled={loading || !title.trim() || !url.trim()}
+                    disabled={loading || !title.trim() || !url.trim() || !isUrlValid}
                     className="bg-foreground text-background px-8 py-4 rounded-none text-[10px] sm:text-xs uppercase tracking-widest font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
                   >
                     {loading ? (

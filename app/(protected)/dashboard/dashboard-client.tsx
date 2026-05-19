@@ -41,6 +41,7 @@ import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { User, Link as DbLink, Project } from "@/db/schema/schema";
+import type { LayoutId } from "@/lib/layouts";
 import { motion, AnimatePresence } from "motion/react";
 import {
   IconSun,
@@ -131,7 +132,8 @@ export function DashboardClient({
   const [seoTitle, setSeoTitle] = useState(user.seoTitle ?? "");
   const [seoDescription, setSeoDescription] = useState(user.seoDescription ?? "");
   const [avatarUrl] = useState(user.avatarUrl ?? authUser.image ?? null);
-  const [background, setBackground] = useState(user.background ?? "aurora");
+  const [theme, setTheme] = useState(user.theme ?? "glassmorphism");
+  const [layout, setLayout] = useState<LayoutId | string>((user as any).layout ?? "sidebar");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [dashboardTheme, setDashboardTheme] = useState<DashboardTheme>("dark");
   const [isThemeReady, setIsThemeReady] = useState(false);
@@ -433,45 +435,44 @@ export function DashboardClient({
         {/* Center Content Workspace */}
         <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-8 pb-24 md:pb-8 relative hide-scrollbar">
            <div className="w-full max-w-5xl mx-auto flex flex-col">
-              {/* Hero Analytics Bar */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 shrink-0">
-              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
-                 <div className="flex items-center gap-2 text-muted-foreground">
-                    <IconEye size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Profile Views</span>
-                 </div>
-                 <div className="text-3xl font-semibold text-foreground">{totalViews.toLocaleString()}</div>
-              </div>
-              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
-                 <div className="flex items-center gap-2 text-muted-foreground">
-                    <IconClick size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Link Clicks</span>
-                 </div>
-                 <div className="text-3xl font-semibold text-foreground">{totalClicks.toLocaleString()}</div>
-              </div>
-              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
-                 <div className="flex items-center gap-2 text-muted-foreground">
-                    <IconTrendingUp size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Avg CTR</span>
-                 </div>
-                 <div className="text-3xl font-semibold text-foreground">{ctr}%</div>
-              </div>
-           </div>
-
-           {/* Tab Content */}
-           <div className="flex-1 w-full">
-              <AnimatePresence mode="wait">
-                 <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex flex-col gap-8 pb-20"
-                 >
-                    {activeTab === "analytics" && (
-                       <div className="flex flex-col gap-6">
-                          <h2 className="text-lg font-semibold text-foreground">Detailed Analytics</h2>
-                          <AnalyticsDashboard views={user.views ?? 0} links={links} events={initialEvents} />
-                       </div>
-                    )}
+            {/* Tab Content */}
+            <div className="flex-1 w-full">
+               <AnimatePresence mode="wait">
+                  <motion.div
+                     key={activeTab}
+                     initial={{ opacity: 0, y: 10 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     exit={{ opacity: 0, y: -10 }}
+                     transition={{ duration: 0.15 }}
+                     className="flex flex-col gap-8 pb-20"
+                  >
+                     {activeTab === "analytics" && (
+                        <div className="flex flex-col gap-6">
+                           {/* Hero Analytics Bar */}
+                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 shrink-0">
+                              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                                 <div className="flex items-center gap-2 text-muted-foreground">
+                                    <IconEye size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Profile Views</span>
+                                 </div>
+                                 <div className="text-3xl font-semibold text-foreground">{totalViews.toLocaleString()}</div>
+                              </div>
+                              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                                 <div className="flex items-center gap-2 text-muted-foreground">
+                                    <IconClick size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Link Clicks</span>
+                                 </div>
+                                 <div className="text-3xl font-semibold text-foreground">{totalClicks.toLocaleString()}</div>
+                              </div>
+                              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                                 <div className="flex items-center gap-2 text-muted-foreground">
+                                    <IconTrendingUp size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Avg CTR</span>
+                                 </div>
+                                 <div className="text-3xl font-semibold text-foreground">{ctr}%</div>
+                              </div>
+                           </div>
+                           <h2 className="text-lg font-semibold text-foreground mt-4">Detailed Analytics</h2>
+                           <AnalyticsDashboard views={user.views ?? 0} links={links} events={initialEvents} />
+                        </div>
+                     )}
 
                     {activeTab === "links" && (
                        <LinksTab 
@@ -516,7 +517,7 @@ export function DashboardClient({
                     )}
 
                     {activeTab === "appearance" && (
-                       <AppearanceTab background={background} setBackground={setBackground} />
+                       <AppearanceTab theme={theme} setTheme={setTheme} layout={layout} setLayout={setLayout} />
                     )}
 
                     {activeTab === "seo" && (
