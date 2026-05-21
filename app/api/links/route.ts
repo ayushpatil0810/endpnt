@@ -69,6 +69,12 @@ export async function POST(request: NextRequest) {
     })
     .returning();
 
+  const [user] = await db.select({ username: users.username }).from(users).where(eq(users.id, session.user.id)).limit(1);
+  if (user?.username) {
+    const { revalidatePath } = require("next/cache");
+    revalidatePath(`/${user.username}`);
+  }
+
   return NextResponse.json(newLink, { status: 201 });
 }
 

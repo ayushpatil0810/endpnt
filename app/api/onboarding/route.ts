@@ -45,6 +45,11 @@ export async function POST(request: NextRequest) {
       .set({ username })
       .where(eq(users.id, session.user.id))
       .returning();
+      
+    if (updated?.username) {
+      const { revalidatePath } = require("next/cache");
+      revalidatePath(`/${updated.username}`);
+    }
     return NextResponse.json(updated);
   }
 
@@ -57,6 +62,11 @@ export async function POST(request: NextRequest) {
       avatarUrl: session.user.image ?? null,
     })
     .returning();
+
+  if (created?.username) {
+    const { revalidatePath } = require("next/cache");
+    revalidatePath(`/${created.username}`);
+  }
 
   return NextResponse.json(created, { status: 201 });
 }

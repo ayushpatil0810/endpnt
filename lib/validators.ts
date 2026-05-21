@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { NextResponse } from "next/server";
 
 // ── Links ──────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,6 @@ export const UpdateProfileSchema = z.object({
  * flat record of { field: message[] }.
  */
 export function validationError(error: z.ZodError): Response {
-  const { NextResponse } = require("next/server");
   return NextResponse.json(
     { error: "Validation failed", issues: error.flatten().fieldErrors },
     { status: 400 }

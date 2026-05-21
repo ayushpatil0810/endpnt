@@ -6,7 +6,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  type CSSProperties,
 } from "react";
 import { flushSync } from "react-dom";
 import {
@@ -72,35 +71,8 @@ type DashboardTheme = "dark" | "light";
 
 const DASHBOARD_THEME_STORAGE_KEY = "endpnt-dashboard-theme";
 
-const DASHBOARD_LIGHT_THEME_VARS = {
-  "--background": "oklch(0.985 0 0)",
-  "--foreground": "oklch(0.13 0 0)",
-  "--card": "oklch(1 0 0)",
-  "--card-foreground": "oklch(0.13 0 0)",
-  "--popover": "oklch(1 0 0)",
-  "--popover-foreground": "oklch(0.13 0 0)",
-  "--primary": "oklch(0.13 0 0)",
-  "--primary-foreground": "oklch(0.985 0 0)",
-  "--secondary": "oklch(0.96 0 0)",
-  "--secondary-foreground": "oklch(0.13 0 0)",
-  "--muted": "oklch(0.96 0 0)",
-  "--muted-foreground": "oklch(0.45 0 0)",
-  "--accent": "oklch(0.96 0 0)",
-  "--accent-foreground": "oklch(0.13 0 0)",
-  "--destructive": "oklch(0.58 0.24 27)",
-  "--destructive-foreground": "oklch(1 0 0)",
-  "--border": "oklch(0.9 0 0)",
-  "--input": "oklch(0.92 0 0)",
-  "--ring": "oklch(0.7 0 0)",
-  "--sidebar": "oklch(0.98 0 0)",
-  "--sidebar-foreground": "oklch(0.13 0 0)",
-  "--sidebar-primary": "oklch(0.13 0 0)",
-  "--sidebar-primary-foreground": "oklch(0.985 0 0)",
-  "--sidebar-accent": "oklch(0.96 0 0)",
-  "--sidebar-accent-foreground": "oklch(0.13 0 0)",
-  "--sidebar-border": "oklch(0.9 0 0)",
-  "--sidebar-ring": "oklch(0.7 0 0)",
-} as const;
+// Dashboard theme is driven purely by the data-dashboard-theme attribute.
+// CSS in globals.css handles all variable overrides — no JS duplication needed.
 
 type Tab = "analytics" | "links" | "projects" | "profile" | "appearance" | "seo";
 
@@ -133,7 +105,7 @@ export function DashboardClient({
   const [seoDescription, setSeoDescription] = useState(user.seoDescription ?? "");
   const [avatarUrl] = useState(user.avatarUrl ?? authUser.image ?? null);
   const [theme, setTheme] = useState(user.theme ?? "glassmorphism");
-  const [layout, setLayout] = useState<LayoutId | string>((user as any).layout ?? "sidebar");
+  const [layout, setLayout] = useState<LayoutId | string>(user.layout ?? "sidebar");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [dashboardTheme, setDashboardTheme] = useState<DashboardTheme>("dark");
   const [isThemeReady, setIsThemeReady] = useState(false);
@@ -269,10 +241,6 @@ export function DashboardClient({
     window.localStorage.setItem(DASHBOARD_THEME_STORAGE_KEY, dashboardTheme);
   }, [dashboardTheme, isThemeReady]);
 
-  const dashboardThemeStyle: CSSProperties =
-    dashboardTheme === "light"
-      ? ({ ...DASHBOARD_LIGHT_THEME_VARS, colorScheme: "light" } as CSSProperties)
-      : ({ colorScheme: "dark" } as CSSProperties);
 
   const profileUrl = `${origin}/${user.username}`;
 
@@ -312,7 +280,6 @@ export function DashboardClient({
     <div
       data-dashboard-theme={dashboardTheme}
       className="min-h-dvh bg-background flex flex-col font-sans selection:bg-primary/20"
-      style={dashboardThemeStyle}
     >
       {/* Top Nav */}
       <nav className="w-full border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-40 px-6 sm:px-8 py-3 flex items-center justify-between">

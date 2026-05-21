@@ -26,18 +26,17 @@ export async function POST(request: NextRequest) {
 
     const referrer = request.headers.get("referer") || request.headers.get("referrer") || null;
 
-    await db.transaction(async (tx) => {
-      await tx
+    await Promise.all([
+      db
         .update(users)
         .set({ views: sql`${users.views} + 1` })
-        .where(eq(users.username, username));
-
-      await tx.insert(events).values({
+        .where(eq(users.username, username)),
+      db.insert(events).values({
         userId: user.id,
         type: "view",
         referrer: referrer ? referrer.substring(0, 255) : null,
-      });
-    });
+      }),
+    ]);
 
     const response = NextResponse.json({ success: true, counted: true });
     response.cookies.set(cookieKey, "1", {

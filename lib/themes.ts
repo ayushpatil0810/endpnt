@@ -136,6 +136,14 @@ export const THEMES: ThemeDefinition[] = [
 
 export const DEFAULT_THEME_ID: ThemeId = "glassmorphism";
 
+/** Border-radius per theme — consumed by ThemedCard and PublicLinkButton. */
+export const RADIUS_MAP: Record<string, string> = {
+  glassmorphism: "1.5rem",
+  "neo-brutalism": "0px",
+  neumorphism: "1.25rem",
+  claymorphism: "2rem",
+};
+
 export function getTheme(id: string | null | undefined): ThemeDefinition {
   return THEMES.find((t) => t.id === id) ?? THEMES[0];
 }

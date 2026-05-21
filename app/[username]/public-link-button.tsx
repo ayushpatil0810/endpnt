@@ -3,18 +3,13 @@
 import type { Link } from "@/db/schema/schema";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { LinkIcon } from "@/components/LinkIcon";
+import { RADIUS_MAP } from "@/lib/themes";
 
 interface PublicLinkButtonProps {
   link: Link;
   themeId?: string;
 }
 
-const RADIUS_MAP: Record<string, string> = {
-  glassmorphism: "1.5rem",
-  "neo-brutalism": "0px",
-  neumorphism: "1.25rem",
-  claymorphism: "2rem",
-};
 
 export function PublicLinkButton({ link, themeId = "glassmorphism" }: PublicLinkButtonProps) {
   async function handleClick() {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db/db";
-import { links } from "@/db/schema/schema";
+import { links, users } from "@/db/schema/schema";
 import { eq, and } from "drizzle-orm";
 import { isUrlSafe } from "@/lib/security";
 import { UpdateLinkSchema } from "@/lib/validators";
@@ -47,6 +47,12 @@ export async function PATCH(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  const [user] = await db.select({ username: users.username }).from(users).where(eq(users.id, session.user.id)).limit(1);
+  if (user?.username) {
+    const { revalidatePath } = require("next/cache");
+    revalidatePath(`/${user.username}`);
+  }
+
   return NextResponse.json(updated);
 }
 
@@ -66,6 +72,12 @@ export async function DELETE(
 
   if (!deleted) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const [user] = await db.select({ username: users.username }).from(users).where(eq(users.id, session.user.id)).limit(1);
+  if (user?.username) {
+    const { revalidatePath } = require("next/cache");
+    revalidatePath(`/${user.username}`);
   }
 
   return NextResponse.json({ success: true });

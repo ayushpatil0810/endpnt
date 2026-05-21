@@ -7,17 +7,17 @@ import { eq } from "drizzle-orm";
 export const runtime = "edge";
 
 const themeGradients: Record<string, [string, string]> = {
-  default: ["#ffffff", "#f4f4f5"],
-  dark: ["#0f0f0f", "#1e1e1e"],
-  minimal: ["#f9f9f9", "#eeeeee"],
-  warm: ["#fdf6ec", "#e8c99a"],
+  glassmorphism:  ["#0f0c29", "#302b63"],
+  "neo-brutalism": ["#f5f0e8", "#e8dcc8"],
+  neumorphism:    ["#e0e5ec", "#c8d0e0"],
+  claymorphism:   ["#fce4ec", "#f3e5f5"],
 };
 
 const themeText: Record<string, string> = {
-  default: "#111111",
-  dark: "#f5f5f5",
-  minimal: "#333333",
-  warm: "#5a3e28",
+  glassmorphism:  "#ffffff",
+  "neo-brutalism": "#1a1a1a",
+  neumorphism:    "#2d3748",
+  claymorphism:   "#4a1942",
 };
 
 export async function GET(request: NextRequest) {

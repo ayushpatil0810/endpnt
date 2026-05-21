@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https://leetcode.com https://dev.to https://api.github.com; frame-src 'self';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https: https://www.google.com; font-src 'self' data:; connect-src 'self' https://leetcode.com https://dev.to https://api.github.com https://gql.hashnode.com https://medium.com; frame-src 'self';",
           },
         ],
       },
