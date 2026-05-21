@@ -279,6 +279,7 @@ async function fetchMinimalRestData(username: string): Promise<GithubProfileData
     pinnedRepos: [], // Cannot get pinned via REST reliably without scraping
     languages: [], // Too many requests to calculate via REST
     totalContributions: 0,
+    calendarData: [], // Cannot get heatmap data via REST
     recentActivity: [],
     followers: data.followers,
     publicRepos: data.public_repos,
