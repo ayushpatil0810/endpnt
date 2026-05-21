@@ -4,6 +4,9 @@ import { PublicLinkButton } from "@/app/[username]/public-link-button";
 import { GithubCalendarSection } from "../sections/github-calendar-section";
 import { DeveloperStatsSection } from "../sections/developer-stats-section";
 import { ArticlesSection } from "../sections/articles-section";
+import { GithubLanguages } from "@/components/GithubLanguages";
+import { GithubTopRepos } from "@/components/GithubTopRepos";
+import { GithubActivityFeed } from "@/components/GithubActivityFeed";
 import type { ProfileLayoutProps } from "../types";
 
 /**
@@ -33,9 +36,23 @@ export function BentoLayout({ user, userLinks, userProjects, theme }: ProfileLay
 
       {/* GitHub calendar */}
       {user.githubUsername && (
-        <div className="col-span-2 md:col-span-4 lg:col-span-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
-          <GithubCalendarSection user={user} theme={theme} />
-        </div>
+        <>
+          <div className="col-span-2 md:col-span-4 lg:col-span-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
+            <GithubCalendarSection user={user} theme={theme} />
+          </div>
+          
+          <div className="col-span-2 md:col-span-2 lg:col-span-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-350 fill-mode-both">
+            <GithubTopRepos username={user.githubUsername} theme={theme} />
+          </div>
+
+          <div className="col-span-2 md:col-span-2 lg:col-span-1 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 fill-mode-both">
+            <GithubLanguages username={user.githubUsername} theme={theme} />
+          </div>
+
+          <div className="col-span-2 md:col-span-4 lg:col-span-1 lg:row-span-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-450 fill-mode-both">
+            <GithubActivityFeed username={user.githubUsername} theme={theme} />
+          </div>
+        </>
       )}
 
       {/* Dev stats */}

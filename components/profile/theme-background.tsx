@@ -6,8 +6,10 @@
  * decoration return null, keeping the DOM clean.
  */
 export function ThemeBackground({ themeId }: { themeId: string }) {
+  let content = null;
+
   if (themeId === "glassmorphism") {
-    return (
+    content = (
       <>
         <div
           className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full pointer-events-none z-0 opacity-30"
@@ -35,10 +37,8 @@ export function ThemeBackground({ themeId }: { themeId: string }) {
         />
       </>
     );
-  }
-
-  if (themeId === "neo-brutalism") {
-    return (
+  } else if (themeId === "neo-brutalism") {
+    content = (
       <>
         {/* Halftone dot grid */}
         <div
@@ -56,10 +56,8 @@ export function ThemeBackground({ themeId }: { themeId: string }) {
         />
       </>
     );
-  }
-
-  if (themeId === "neumorphism") {
-    return (
+  } else if (themeId === "neumorphism") {
+    content = (
       <div
         className="absolute inset-0 pointer-events-none z-0 opacity-[0.025]"
         style={{
@@ -70,10 +68,8 @@ export function ThemeBackground({ themeId }: { themeId: string }) {
         }}
       />
     );
-  }
-
-  if (themeId === "claymorphism") {
-    return (
+  } else if (themeId === "claymorphism") {
+    content = (
       <>
         <div
           className="absolute top-[-15%] right-[-5%] w-[500px] h-[500px] rounded-full pointer-events-none z-0 opacity-40"
@@ -95,5 +91,11 @@ export function ThemeBackground({ themeId }: { themeId: string }) {
     );
   }
 
-  return null;
+  if (!content) return null;
+
+  return (
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      {content}
+    </div>
+  );
 }

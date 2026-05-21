@@ -4,6 +4,9 @@ import { DeveloperStatsSection } from "../sections/developer-stats-section";
 import { GithubCalendarSection } from "../sections/github-calendar-section";
 import { ProjectsSection } from "../sections/projects-section";
 import { ArticlesSection } from "../sections/articles-section";
+import { GithubLanguages } from "@/components/GithubLanguages";
+import { GithubTopRepos } from "@/components/GithubTopRepos";
+import { GithubActivityFeed } from "@/components/GithubActivityFeed";
 import type { ProfileLayoutProps } from "../types";
 
 /**
@@ -30,7 +33,15 @@ export function MinimalLayout({ user, userLinks, userProjects, theme }: ProfileL
       )}
 
       <DeveloperStatsSection user={user} theme={theme} />
-      <GithubCalendarSection user={user} theme={theme} />
+      
+      {user.githubUsername && (
+        <div className="flex flex-col gap-6 sm:gap-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
+          <GithubCalendarSection user={user} theme={theme} />
+          <GithubTopRepos username={user.githubUsername} theme={theme} />
+          <GithubLanguages username={user.githubUsername} theme={theme} />
+          <GithubActivityFeed username={user.githubUsername} theme={theme} />
+        </div>
+      )}
       <ProjectsSection
         projects={userProjects}
         theme={theme}

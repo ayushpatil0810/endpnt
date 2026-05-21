@@ -41,12 +41,12 @@ function StatCard({
  * Each card is independently suspended and error-bounded so a failed
  * third-party API doesn't take down the whole section.
  */
-export function DeveloperStatsSection({ user, theme }: DeveloperStatsSectionProps) {
+export function DeveloperStatsSection({ user, theme, stacked = false }: DeveloperStatsSectionProps & { stacked?: boolean }) {
   const hasGithub = !!user.githubUsername;
   const hasLeetcode = !!user.leetcodeUsername;
 
   if (!hasGithub && !hasLeetcode) return null;
-  const colClass = hasGithub && hasLeetcode ? "md:grid-cols-2" : "md:grid-cols-1";
+  const colClass = stacked ? "grid-cols-1" : (hasGithub && hasLeetcode ? "md:grid-cols-2" : "md:grid-cols-1");
 
   return (
     <div className={`grid grid-cols-1 ${colClass} gap-4 sm:gap-6`}>

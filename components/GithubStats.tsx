@@ -1,25 +1,19 @@
 import { IconBrandGithub } from "@tabler/icons-react";
 
+import { getGithubProfile } from "@/lib/github";
+
 const formatNumber = (num: number) => 
   Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num || 0);
 
 export async function GithubStats({ username }: { username: string }) {
   if (!username) return null;
 
-  let data;
-  try {
-    const res = await fetch(`https://api.github.com/users/${username}`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return null;
-    data = await res.json();
-  } catch {
-    return null;
-  }
+  const profile = await getGithubProfile(username);
+  if (!profile) return null;
 
   return (
     <a
-      href={`https://github.com/${data.login}`}
+      href={`https://github.com/${profile.username}`}
       target="_blank"
       rel="noopener noreferrer"
       className="w-full h-full p-6 flex flex-col gap-4 group hover:bg-foreground/5 transition-colors"
@@ -31,7 +25,7 @@ export async function GithubStats({ username }: { username: string }) {
             GitHub
           </span>
           <span className="text-[10px] font-mono" style={{ color: "var(--theme-text-secondary)" }}>
-            @{data.login}
+            @{profile.username}
           </span>
         </div>
       </div>
@@ -44,7 +38,7 @@ export async function GithubStats({ username }: { username: string }) {
             Repos
           </span>
           <span className="text-sm font-bold text-inherit">
-            {formatNumber(data.public_repos || 0)}
+            {formatNumber(profile.publicRepos || 0)}
           </span>
         </div>
         <div className="flex items-center justify-between w-full">
@@ -52,7 +46,7 @@ export async function GithubStats({ username }: { username: string }) {
             Followers
           </span>
           <span className="text-sm font-bold text-inherit">
-            {formatNumber(data.followers || 0)}
+            {formatNumber(profile.followers || 0)}
           </span>
         </div>
         <div className="flex items-center justify-between w-full">
@@ -60,7 +54,8 @@ export async function GithubStats({ username }: { username: string }) {
             Following
           </span>
           <span className="text-sm font-bold text-inherit">
-            {formatNumber(data.following || 0)}
+            {/* Following isn't exposed yet but leaving zero as fallback */}
+            {formatNumber(0)}
           </span>
         </div>
       </div>

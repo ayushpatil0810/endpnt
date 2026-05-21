@@ -43,7 +43,7 @@ export function GithubCalendarSection({ user, theme }: GithubCalendarSectionProp
         </div>
         <ErrorBoundary fallbackMessage="Failed to load GitHub calendar">
           <Suspense fallback={<GithubCalendarSkeleton />}>
-            <GithubCalendar username={user.githubUsername} />
+            <GithubCalendar username={user.githubUsername} themeId={theme.id} />
           </Suspense>
         </ErrorBoundary>
       </ThemedCard>

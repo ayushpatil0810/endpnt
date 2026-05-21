@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { IconFileText } from "@tabler/icons-react";
 import { ThemedCard } from "./themed-card";
+import { GithubStatus } from "@/components/GithubStatus";
 import type { ThemeDefinition } from "@/lib/themes";
 import type { User } from "./types";
 
@@ -83,6 +84,12 @@ export function HeroCard({ user, theme, alignCenter = false }: HeroCardProps) {
             >
               {user.bio}
             </p>
+          )}
+
+          {user.githubUsername && (
+            <div className={`mt-5 flex ${alignCenter ? "justify-center" : "justify-center lg:justify-start"} w-full`}>
+              <GithubStatus username={user.githubUsername} />
+            </div>
           )}
         </div>
       </div>

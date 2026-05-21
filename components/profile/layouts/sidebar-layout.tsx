@@ -4,6 +4,9 @@ import { DeveloperStatsSection } from "../sections/developer-stats-section";
 import { GithubCalendarSection } from "../sections/github-calendar-section";
 import { ProjectsSection } from "../sections/projects-section";
 import { ArticlesSection } from "../sections/articles-section";
+import { GithubLanguages } from "@/components/GithubLanguages";
+import { GithubTopRepos } from "@/components/GithubTopRepos";
+import { GithubActivityFeed } from "@/components/GithubActivityFeed";
 import type { ProfileLayoutProps } from "../types";
 
 /**
@@ -18,6 +21,7 @@ export function SidebarLayout({ user, userLinks, userProjects, theme }: ProfileL
       <aside className="lg:col-span-4 flex flex-col">
         <div className="lg:sticky lg:top-8 flex flex-col gap-6">
           <HeroCard user={user} theme={theme} />
+          <DeveloperStatsSection user={user} theme={theme} stacked />
         </div>
       </aside>
 
@@ -36,8 +40,16 @@ export function SidebarLayout({ user, userLinks, userProjects, theme }: ProfileL
           </div>
         )}
 
-        <DeveloperStatsSection user={user} theme={theme} />
-        <GithubCalendarSection user={user} theme={theme} />
+        {user.githubUsername && (
+          <div className="flex flex-col gap-6 sm:gap-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
+            <GithubCalendarSection user={user} theme={theme} />
+            <GithubTopRepos username={user.githubUsername} theme={theme} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              <GithubLanguages username={user.githubUsername} theme={theme} />
+              <GithubActivityFeed username={user.githubUsername} theme={theme} />
+            </div>
+          </div>
+        )}
         <ProjectsSection
           projects={userProjects}
           theme={theme}
