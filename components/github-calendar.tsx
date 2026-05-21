@@ -20,8 +20,6 @@ export async function GithubCalendar({ username, themeId }: { username: string; 
         fontSize={12}
         blockSize={12}
         blockMargin={4}
-        hideColorLegend
-        hideTotalCount
       />
     </div>
   );
