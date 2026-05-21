@@ -1,9 +1,18 @@
 import { Suspense } from "react";
-import { DevtoPosts } from "@/components/DevToPosts";
-import { BlogPosts } from "@/components/BlogPosts";
+import dynamic from "next/dynamic";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DevtoPostsSkeleton, BlogPostsSkeleton } from "@/components/profile-skeletons";
 import { ThemedCard } from "../themed-card";
+
+const DevtoPosts = dynamic(
+  () => import("@/components/DevToPosts").then(mod => mod.DevtoPosts),
+  { loading: () => <DevtoPostsSkeleton /> }
+);
+
+const BlogPosts = dynamic(
+  () => import("@/components/BlogPosts").then(mod => mod.BlogPosts),
+  { loading: () => <BlogPostsSkeleton /> }
+);
 import type { ThemeDefinition } from "@/lib/themes";
 import type { User } from "../types";
 

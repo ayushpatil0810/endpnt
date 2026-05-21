@@ -22,41 +22,44 @@ export async function GithubStats({ username }: { username: string }) {
       href={`https://github.com/${data.login}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="w-full p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 group hover:border-foreground/30 transition-colors"
+      className="w-full h-full p-6 flex flex-col gap-4 group hover:bg-foreground/5 transition-colors"
     >
       <div className="flex items-center gap-3">
-        <IconBrandGithub size={24} className="text-foreground" />
+        <IconBrandGithub size={24} className="text-inherit" />
         <div className="flex flex-col">
-          <span className="text-sm font-semibold text-foreground tracking-tight">
+          <span className="text-sm font-semibold text-inherit tracking-tight">
             GitHub
           </span>
-          <span className="text-[10px] text-muted-foreground font-mono">
+          <span className="text-[10px] font-mono" style={{ color: "var(--theme-text-secondary)" }}>
             @{data.login}
           </span>
         </div>
       </div>
-      <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border/10 w-full">
+      <div 
+        className="flex flex-col gap-3 mt-4 pt-4 border-t w-full"
+        style={{ borderColor: "var(--theme-separator)" }}
+      >
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
             Repos
           </span>
-          <span className="text-sm font-bold text-foreground">
+          <span className="text-sm font-bold text-inherit">
             {formatNumber(data.public_repos || 0)}
           </span>
         </div>
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
             Followers
           </span>
-          <span className="text-sm font-bold text-foreground">
+          <span className="text-sm font-bold text-inherit">
             {formatNumber(data.followers || 0)}
           </span>
         </div>
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
             Following
           </span>
-          <span className="text-sm font-bold text-foreground">
+          <span className="text-sm font-bold text-inherit">
             {formatNumber(data.following || 0)}
           </span>
         </div>

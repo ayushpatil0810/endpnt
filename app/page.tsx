@@ -8,7 +8,6 @@ import {
   IconCheck,
   IconClockHour4,
   IconFlame,
-  IconGauge,
   IconLink,
   IconLock,
   IconRocket,

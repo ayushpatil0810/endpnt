@@ -51,7 +51,7 @@ export const THEMES: ThemeDefinition[] = [
   {
     id: "neo-brutalism",
     name: "Neo Brutalism",
-    description: "Raw, bold, unapologetically loud — borders and offset shadows",
+    description: "Raw, bold, unapologetically loud with borders and offset shadows",
     previewColors: ["#f5f3ea", "#11d7d1", "#10172b"],
     pageClasses: "text-[#10172b]",
     cssVars: {
@@ -77,7 +77,7 @@ export const THEMES: ThemeDefinition[] = [
   {
     id: "neumorphism",
     name: "Neumorphism",
-    description: "Soft extruded surfaces, subtle depth — digital clay",
+    description: "Soft extruded surfaces with subtle depth like digital clay",
     previewColors: ["#e0e5ec", "#c8d0e7", "#a3b1c6"],
     pageClasses: "text-[#5a6a85]",
     cssVars: {

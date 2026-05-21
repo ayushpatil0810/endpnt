@@ -23,14 +23,21 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { ProfileHeader } from "@/components/ProfileHeader";
-import { LinkCard } from "@/components/LinkCard";
-import { LinkForm } from "@/components/LinkForm";
-import { ThemePicker } from "@/components/ThemePicker";
-import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
+import dynamic from "next/dynamic";
+import { IconLoader2 } from "@tabler/icons-react";
+
+const AnalyticsDashboard = dynamic(
+  () => import("@/components/AnalyticsDashboard").then((mod) => mod.AnalyticsDashboard),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[400px] flex items-center justify-center border border-border/40 bg-card/10">
+        <IconLoader2 className="animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+);
 import { ShareModal } from "@/components/ShareModal";
-import { ProjectCard } from "@/components/ProjectCard";
-import { ProjectForm } from "@/components/ProjectForm";
 import { LinksTab } from "./tabs/LinksTab";
 import { ProjectsTab } from "./tabs/ProjectsTab";
 import { ProfileTab } from "./tabs/ProfileTab";
@@ -110,7 +117,7 @@ export function DashboardClient({
   const [dashboardTheme, setDashboardTheme] = useState<DashboardTheme>("dark");
   const [isThemeReady, setIsThemeReady] = useState(false);
   const toggleBtnRef = useRef<HTMLButtonElement>(null);
-  
+
   const [activeTab, setActiveTab] = useState<Tab>("links");
   const [origin, setOrigin] = useState("https://endpnt.dev");
 
@@ -319,7 +326,7 @@ export function DashboardClient({
               )}
             </AnimatePresence>
           </button>
-          
+
           <button
             onClick={() => setIsShareModalOpen(true)}
             className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-widest font-semibold text-background bg-foreground hover:bg-foreground/90 transition-colors px-3 py-1.5 rounded-md"
@@ -344,27 +351,27 @@ export function DashboardClient({
 
       {/* Main Workspace */}
       <main className="flex-1 w-full max-w-[1600px] mx-auto flex overflow-hidden h-[calc(100vh-56px)]">
-        
+
         {/* Left Sidebar Navigation */}
         <aside className="w-64 border-r border-border/40 bg-background flex-col pt-6 pb-6 overflow-y-auto hidden md:flex shrink-0">
           <div className="px-6 pb-6 mb-2 border-b border-border/20">
-             <div className="flex items-center gap-3">
-                 <div className="size-10 rounded-full border border-border/30 overflow-hidden bg-card/20 shrink-0 relative">
-                    {avatarUrl ? (
-                      <Image src={avatarUrl} alt="Avatar" fill className="object-cover" sizes="40px" />
-                    ) : (
-                      <div className="size-full flex items-center justify-center font-serif italic text-muted-foreground">
-                         {user.username.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                 </div>
-                <div className="flex flex-col overflow-hidden">
-                   <span className="text-sm font-semibold truncate text-foreground normal-case">{user.username}</span>
-                   <span className="text-[10px] uppercase font-mono text-muted-foreground truncate">
-                     {origin.replace(/^https?:\/\//, '')}/{user.username}
-                   </span>
-                </div>
-             </div>
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-full border border-border/30 overflow-hidden bg-card/20 shrink-0 relative">
+                {avatarUrl ? (
+                  <Image src={avatarUrl} alt="Avatar" fill className="object-cover" sizes="40px" />
+                ) : (
+                  <div className="size-full flex items-center justify-center font-serif italic text-muted-foreground">
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-sm font-semibold truncate text-foreground normal-case">{user.username}</span>
+                <span className="text-[10px] uppercase font-mono text-muted-foreground truncate">
+                  {origin.replace(/^https?:\/\//, '')}/{user.username}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col px-3 gap-1">
@@ -375,11 +382,10 @@ export function DashboardClient({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                    isActive 
-                      ? "bg-foreground/10 text-foreground font-medium" 
-                      : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive
+                    ? "bg-foreground/10 text-foreground font-medium"
+                    : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
+                    }`}
                 >
                   <Icon size={18} stroke={isActive ? 2 : 1.5} />
                   {tab.label}
@@ -389,117 +395,117 @@ export function DashboardClient({
           </div>
 
           <div className="mt-auto px-3 border-t border-border/20 pt-4">
-             <button
-                onClick={handleSignOut}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 w-full rounded-lg transition-colors"
-             >
-                <IconLogout size={18} stroke={1.5} />
-                Sign Out
-             </button>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 w-full rounded-lg transition-colors"
+            >
+              <IconLogout size={18} stroke={1.5} />
+              Sign Out
+            </button>
           </div>
         </aside>
 
         {/* Center Content Workspace */}
         <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-8 pb-24 md:pb-8 relative hide-scrollbar">
-           <div className="w-full max-w-5xl mx-auto flex flex-col">
+          <div className="w-full max-w-5xl mx-auto flex flex-col">
             {/* Tab Content */}
             <div className="flex-1 w-full">
-               <AnimatePresence mode="wait">
-                  <motion.div
-                     key={activeTab}
-                     initial={{ opacity: 0, y: 10 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     exit={{ opacity: 0, y: -10 }}
-                     transition={{ duration: 0.15 }}
-                     className="flex flex-col gap-8 pb-20"
-                  >
-                     {activeTab === "analytics" && (
-                        <div className="flex flex-col gap-6">
-                           {/* Hero Analytics Bar */}
-                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 shrink-0">
-                              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
-                                 <div className="flex items-center gap-2 text-muted-foreground">
-                                    <IconEye size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Profile Views</span>
-                                 </div>
-                                 <div className="text-3xl font-semibold text-foreground">{totalViews.toLocaleString()}</div>
-                              </div>
-                              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
-                                 <div className="flex items-center gap-2 text-muted-foreground">
-                                    <IconClick size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Link Clicks</span>
-                                 </div>
-                                 <div className="text-3xl font-semibold text-foreground">{totalClicks.toLocaleString()}</div>
-                              </div>
-                              <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
-                                 <div className="flex items-center gap-2 text-muted-foreground">
-                                    <IconTrendingUp size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Avg CTR</span>
-                                 </div>
-                                 <div className="text-3xl font-semibold text-foreground">{ctr}%</div>
-                              </div>
-                           </div>
-                           <h2 className="text-lg font-semibold text-foreground mt-4">Detailed Analytics</h2>
-                           <AnalyticsDashboard views={user.views ?? 0} links={links} events={initialEvents} />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex flex-col gap-8 pb-20"
+                >
+                  {activeTab === "analytics" && (
+                    <div className="flex flex-col gap-6">
+                      {/* Hero Analytics Bar */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 shrink-0">
+                        <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <IconEye size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Profile Views</span>
+                          </div>
+                          <div className="text-3xl font-semibold text-foreground">{totalViews.toLocaleString()}</div>
                         </div>
-                     )}
+                        <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <IconClick size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Link Clicks</span>
+                          </div>
+                          <div className="text-3xl font-semibold text-foreground">{totalClicks.toLocaleString()}</div>
+                        </div>
+                        <div className="bg-card/20 border border-border/40 rounded-xl p-5 flex flex-col gap-2 hover:bg-card/40 transition-colors">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <IconTrendingUp size={16} /> <span className="text-xs uppercase tracking-widest font-mono">Avg CTR</span>
+                          </div>
+                          <div className="text-3xl font-semibold text-foreground">{ctr}%</div>
+                        </div>
+                      </div>
+                      <h2 className="text-lg font-semibold text-foreground mt-4">Detailed Analytics</h2>
+                      <AnalyticsDashboard views={user.views ?? 0} links={links} events={initialEvents} />
+                    </div>
+                  )}
 
-                    {activeTab === "links" && (
-                       <LinksTab 
-                         links={links} 
-                         sensors={sensors} 
-                         handleDragEnd={handleDragEnd} 
-                         handleLinkUpdated={handleLinkUpdated} 
-                         handleLinkDeleted={handleLinkDeleted} 
-                         handleLinkAdded={handleLinkAdded} 
-                       />
-                    )}
+                  {activeTab === "links" && (
+                    <LinksTab
+                      links={links}
+                      sensors={sensors}
+                      handleDragEnd={handleDragEnd}
+                      handleLinkUpdated={handleLinkUpdated}
+                      handleLinkDeleted={handleLinkDeleted}
+                      handleLinkAdded={handleLinkAdded}
+                    />
+                  )}
 
-                    {activeTab === "projects" && (
-                       <ProjectsTab 
-                         projects={projects} 
-                         sensors={sensors} 
-                         handleProjectDragEnd={handleProjectDragEnd} 
-                         handleProjectUpdated={handleProjectUpdated} 
-                         handleProjectDeleted={handleProjectDeleted} 
-                         handleProjectAdded={handleProjectAdded} 
-                       />
-                    )}
+                  {activeTab === "projects" && (
+                    <ProjectsTab
+                      projects={projects}
+                      sensors={sensors}
+                      handleProjectDragEnd={handleProjectDragEnd}
+                      handleProjectUpdated={handleProjectUpdated}
+                      handleProjectDeleted={handleProjectDeleted}
+                      handleProjectAdded={handleProjectAdded}
+                    />
+                  )}
 
-                    {activeTab === "profile" && (
-                       <ProfileTab 
-                         username={user.username} 
-                         bio={bio} 
-                         avatarUrl={avatarUrl} 
-                         setBio={setBio} 
-                         githubUsername={githubUsername} 
-                         setGithubUsername={setGithubUsername} 
-                         leetcodeUsername={leetcodeUsername} 
-                         setLeetcodeUsername={setLeetcodeUsername} 
-                         devtoUsername={devtoUsername} 
-                         setDevtoUsername={setDevtoUsername} 
-                         mediumUsername={mediumUsername} 
-                         setMediumUsername={setMediumUsername} 
-                         hashnodeUsername={hashnodeUsername} 
-                         setHashnodeUsername={setHashnodeUsername} 
-                         handleIntegrationSave={handleIntegrationSave} 
-                       />
-                    )}
+                  {activeTab === "profile" && (
+                    <ProfileTab
+                      username={user.username}
+                      bio={bio}
+                      avatarUrl={avatarUrl}
+                      setBio={setBio}
+                      githubUsername={githubUsername}
+                      setGithubUsername={setGithubUsername}
+                      leetcodeUsername={leetcodeUsername}
+                      setLeetcodeUsername={setLeetcodeUsername}
+                      devtoUsername={devtoUsername}
+                      setDevtoUsername={setDevtoUsername}
+                      mediumUsername={mediumUsername}
+                      setMediumUsername={setMediumUsername}
+                      hashnodeUsername={hashnodeUsername}
+                      setHashnodeUsername={setHashnodeUsername}
+                      handleIntegrationSave={handleIntegrationSave}
+                    />
+                  )}
 
-                    {activeTab === "appearance" && (
-                       <AppearanceTab theme={theme} setTheme={setTheme} layout={layout} setLayout={setLayout} />
-                    )}
+                  {activeTab === "appearance" && (
+                    <AppearanceTab theme={theme} setTheme={setTheme} layout={layout} setLayout={setLayout} />
+                  )}
 
-                    {activeTab === "seo" && (
-                       <SeoTab 
-                         seoTitle={seoTitle} 
-                         setSeoTitle={setSeoTitle} 
-                         seoDescription={seoDescription} 
-                         setSeoDescription={setSeoDescription} 
-                         handleSeoSave={handleSeoSave} 
-                       />
-                    )}
-                 </motion.div>
+                  {activeTab === "seo" && (
+                    <SeoTab
+                      seoTitle={seoTitle}
+                      setSeoTitle={setSeoTitle}
+                      seoDescription={seoDescription}
+                      setSeoDescription={setSeoDescription}
+                      handleSeoSave={handleSeoSave}
+                    />
+                  )}
+                </motion.div>
               </AnimatePresence>
-           </div>
-           </div>
+            </div>
+          </div>
         </div>
 
 
@@ -515,9 +521,8 @@ export function DashboardClient({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors ${
-                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors ${isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 <Icon size={20} stroke={isActive ? 2 : 1.5} />
                 <span className="text-[9px] font-medium">{tab.label.split(" ")[0]}</span>
@@ -526,7 +531,7 @@ export function DashboardClient({
           })}
         </div>
       </div>
-      
+
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}

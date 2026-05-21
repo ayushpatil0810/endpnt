@@ -37,39 +37,42 @@ export async function LeetcodeStats({ username }: { username: string }) {
       href={`https://leetcode.com/${username}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="w-full p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 group hover:border-[#FFA116]/40 transition-colors relative overflow-hidden"
+      className="w-full h-full p-6 flex flex-col gap-4 group hover:bg-[#FFA116]/5 transition-colors relative overflow-hidden"
     >
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#FFA116]/10 blur-3xl rounded-full pointer-events-none" />
       <div className="flex items-center gap-3 z-10">
         <LeetCodeIcon />
         <div className="flex flex-col">
-          <span className="text-sm font-semibold text-foreground tracking-tight">
+          <span className="text-sm font-semibold text-inherit tracking-tight">
             LeetCode
           </span>
-          <span className="text-[10px] text-muted-foreground font-mono">
+          <span className="text-[10px] font-mono" style={{ color: "var(--theme-text-secondary)" }}>
             @{username}
           </span>
         </div>
       </div>
-      <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border/10 w-full z-10">
+      <div 
+        className="flex flex-col gap-3 mt-4 pt-4 border-t w-full z-10"
+        style={{ borderColor: "var(--theme-separator)" }}
+      >
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
             Solved
           </span>
-          <span className="text-sm font-bold text-foreground">
+          <span className="text-sm font-bold text-inherit">
             {formatNumber(data.solvedProblem || 0)}
           </span>
         </div>
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
             Easy
           </span>
-          <span className="text-sm font-bold text-emerald-400">
+          <span className="text-sm font-bold text-emerald-500">
             {formatNumber(data.easySolved || 0)}
           </span>
         </div>
         <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
             Medium
           </span>
           <span className="text-sm font-bold text-amber-500">

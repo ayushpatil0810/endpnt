@@ -5,7 +5,12 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { cache } from "react";
 import { getTheme } from "@/lib/themes";
-import { ViewTracker } from "@/components/ViewTracker";
+import dynamic from "next/dynamic";
+
+const ViewTracker = dynamic(
+  () => import("@/components/ViewTracker").then((mod) => mod.ViewTracker)
+);
+
 import {
   SidebarLayout,
   BentoLayout,

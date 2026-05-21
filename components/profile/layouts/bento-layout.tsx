@@ -38,9 +38,9 @@ export function BentoLayout({ user, userLinks, userProjects, theme }: ProfileLay
         </div>
       )}
 
-      {/* Dev stats — each card gets its own bento cell */}
-      {user.githubUsername && (
-        <div className="col-span-2 md:col-span-2 lg:col-span-1 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 fill-mode-both">
+      {/* Dev stats */}
+      {(user.githubUsername || user.leetcodeUsername) && (
+        <div className="col-span-2 md:col-span-4 lg:col-span-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 fill-mode-both">
           <DeveloperStatsSection user={user} theme={theme} />
         </div>
       )}

@@ -1,9 +1,18 @@
 import { Suspense } from "react";
-import { GithubStats } from "@/components/GithubStats";
-import { LeetcodeStats } from "@/components/leetcode-stats";
+import dynamic from "next/dynamic";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GithubStatsSkeleton, LeetcodeStatsSkeleton } from "@/components/profile-skeletons";
 import { ThemedCard } from "../themed-card";
+
+const GithubStats = dynamic(
+  () => import("@/components/GithubStats").then(mod => mod.GithubStats),
+  { loading: () => <GithubStatsSkeleton /> }
+);
+
+const LeetcodeStats = dynamic(
+  () => import("@/components/leetcode-stats").then(mod => mod.LeetcodeStats),
+  { loading: () => <LeetcodeStatsSkeleton /> }
+);
 import type { ThemeDefinition } from "@/lib/themes";
 import type { User } from "../types";
 
@@ -13,25 +22,14 @@ interface DeveloperStatsSectionProps {
 }
 
 function StatCard({
-  title,
   theme,
   children,
 }: {
-  title: string;
   theme: ThemeDefinition;
   children: React.ReactNode;
 }) {
   return (
-    <ThemedCard theme={theme} className="flex flex-col gap-4 p-6 h-full">
-      <h2
-        className="text-[10px] font-mono tracking-widest uppercase pb-3"
-        style={{
-          color: "var(--theme-text-secondary)",
-          borderBottom: "1px solid var(--theme-separator)",
-        }}
-      >
-        {title}
-      </h2>
+    <ThemedCard theme={theme} className="h-full overflow-hidden">
       {children}
     </ThemedCard>
   );
@@ -44,27 +42,31 @@ function StatCard({
  * third-party API doesn't take down the whole section.
  */
 export function DeveloperStatsSection({ user, theme }: DeveloperStatsSectionProps) {
-  if (!user.githubUsername && !user.leetcodeUsername) return null;
+  const hasGithub = !!user.githubUsername;
+  const hasLeetcode = !!user.leetcodeUsername;
+
+  if (!hasGithub && !hasLeetcode) return null;
+  const colClass = hasGithub && hasLeetcode ? "md:grid-cols-2" : "md:grid-cols-1";
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-      {user.githubUsername && (
+    <div className={`grid grid-cols-1 ${colClass} gap-4 sm:gap-6`}>
+      {hasGithub && (
         <div className="animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
-          <StatCard title="GitHub" theme={theme}>
+          <StatCard theme={theme}>
             <ErrorBoundary fallbackMessage="Failed to load GitHub stats">
               <Suspense fallback={<GithubStatsSkeleton />}>
-                <GithubStats username={user.githubUsername} />
+                <GithubStats username={user.githubUsername!} />
               </Suspense>
             </ErrorBoundary>
           </StatCard>
         </div>
       )}
-      {user.leetcodeUsername && (
+      {hasLeetcode && (
         <div className="animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 fill-mode-both">
-          <StatCard title="LeetCode" theme={theme}>
+          <StatCard theme={theme}>
             <ErrorBoundary fallbackMessage="Failed to load LeetCode stats">
               <Suspense fallback={<LeetcodeStatsSkeleton />}>
-                <LeetcodeStats username={user.leetcodeUsername} />
+                <LeetcodeStats username={user.leetcodeUsername!} />
               </Suspense>
             </ErrorBoundary>
           </StatCard>

@@ -1,9 +1,16 @@
 import { Suspense } from "react";
 import { IconBrandGithub } from "@tabler/icons-react";
-import { GithubCalendar } from "@/components/github-calendar";
+import dynamic from "next/dynamic";
+import { ThemedCard } from "../themed-card";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GithubCalendarSkeleton } from "@/components/profile-skeletons";
-import { ThemedCard } from "../themed-card";
+
+const GithubCalendar = dynamic(
+  () => import("@/components/github-calendar").then((mod) => mod.GithubCalendar),
+  { 
+    loading: () => <GithubCalendarSkeleton />
+  }
+);
 import type { ThemeDefinition } from "@/lib/themes";
 import type { User } from "../types";
 
