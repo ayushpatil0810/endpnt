@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/db";
 import { users, events } from "@/db/schema/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { trackProfileView } from "@/lib/analytics-batcher";
 
 const COOKIE_TTL_SECONDS = 60 * 60 * 24; // 24 hours
 
@@ -26,17 +27,11 @@ export async function POST(request: NextRequest) {
 
     const referrer = request.headers.get("referer") || request.headers.get("referrer") || null;
 
-    await Promise.all([
-      db
-        .update(users)
-        .set({ views: sql`${users.views} + 1` })
-        .where(eq(users.username, username)),
-      db.insert(events).values({
-        userId: user.id,
-        type: "view",
-        referrer: referrer ? referrer.substring(0, 255) : null,
-      }),
-    ]);
+    trackProfileView({
+      userId: user.id,
+      username: username,
+      referrer: referrer ? referrer.substring(0, 255) : null,
+    });
 
     const response = NextResponse.json({ success: true, counted: true });
     response.cookies.set(cookieKey, "1", {
