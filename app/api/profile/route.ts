@@ -1,66 +1,74 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { db } from "@/db/db";
-import { users } from "@/db/schema/schema";
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { UpdateProfileSchema } from "@/lib/validators";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { db } from '@/db/db';
+import { users } from '@/db/schema/schema';
+import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
+import { UpdateProfileSchema } from '@/lib/validators';
 
 export async function GET(request: NextRequest) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	const session = await auth.api.getSession({ headers: request.headers });
+	if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, session.user.id))
-    .limit(1);
+	const [user] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
 
-  if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(user);
+	if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+	return NextResponse.json(user);
 }
 
 export async function PATCH(request: NextRequest) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	const session = await auth.api.getSession({ headers: request.headers });
+	if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json();
-  const parsed = UpdateProfileSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    );
-  }
+	const body = await request.json();
+	const parsed = UpdateProfileSchema.safeParse(body);
+	if (!parsed.success) {
+		return NextResponse.json(
+			{ error: 'Validation failed', issues: parsed.error.flatten().fieldErrors },
+			{ status: 400 }
+		);
+	}
 
-  const {
-    bio, theme, layout,
-    githubUsername, leetcodeUsername, devtoUsername, mediumUsername, hashnodeUsername,
-    seoTitle, seoDescription,
-  } = parsed.data;
+	const {
+		bio,
+		theme,
+		layout,
+		githubUsername,
+		leetcodeUsername,
+		devtoUsername,
+		mediumUsername,
+		hashnodeUsername,
+		seoTitle,
+		seoDescription,
+	} = parsed.data;
 
-  const updateData: Record<string, unknown> = {};
-  if (bio !== undefined) updateData.bio = bio;
-  if (theme !== undefined) updateData.theme = theme;
-  if (layout !== undefined) updateData.layout = layout;
-  if (githubUsername !== undefined) updateData.githubUsername = githubUsername === "" ? null : githubUsername;
-  if (leetcodeUsername !== undefined) updateData.leetcodeUsername = leetcodeUsername === "" ? null : leetcodeUsername;
-  if (devtoUsername !== undefined) updateData.devtoUsername = devtoUsername === "" ? null : devtoUsername;
-  if (mediumUsername !== undefined) updateData.mediumUsername = mediumUsername === "" ? null : mediumUsername;
-  if (hashnodeUsername !== undefined) updateData.hashnodeUsername = hashnodeUsername === "" ? null : hashnodeUsername;
-  if (seoTitle !== undefined) updateData.seoTitle = seoTitle === "" ? null : seoTitle;
-  if (seoDescription !== undefined) updateData.seoDescription = seoDescription === "" ? null : seoDescription;
+	const updateData: Record<string, unknown> = {};
+	if (bio !== undefined) updateData.bio = bio;
+	if (theme !== undefined) updateData.theme = theme;
+	if (layout !== undefined) updateData.layout = layout;
+	if (githubUsername !== undefined)
+		updateData.githubUsername = githubUsername === '' ? null : githubUsername;
+	if (leetcodeUsername !== undefined)
+		updateData.leetcodeUsername = leetcodeUsername === '' ? null : leetcodeUsername;
+	if (devtoUsername !== undefined)
+		updateData.devtoUsername = devtoUsername === '' ? null : devtoUsername;
+	if (mediumUsername !== undefined)
+		updateData.mediumUsername = mediumUsername === '' ? null : mediumUsername;
+	if (hashnodeUsername !== undefined)
+		updateData.hashnodeUsername = hashnodeUsername === '' ? null : hashnodeUsername;
+	if (seoTitle !== undefined) updateData.seoTitle = seoTitle === '' ? null : seoTitle;
+	if (seoDescription !== undefined)
+		updateData.seoDescription = seoDescription === '' ? null : seoDescription;
 
-  const [updated] = await db
-    .update(users)
-    .set(updateData)
-    .where(eq(users.id, session.user.id))
-    .returning();
+	const [updated] = await db
+		.update(users)
+		.set(updateData)
+		.where(eq(users.id, session.user.id))
+		.returning();
 
-  if (updated?.username) {
-    revalidatePath(`/${updated.username}`);
-  }
+	if (updated?.username) {
+		revalidatePath(`/${updated.username}`);
+	}
 
-  return NextResponse.json(updated);
+	return NextResponse.json(updated);
 }
-

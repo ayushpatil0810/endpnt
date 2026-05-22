@@ -24,12 +24,14 @@ endpnt is a beautiful, developer-first link-in-bio application. It consolidates 
 ## Getting Started
 
 1. **Clone the repository** and install dependencies:
+
    ```bash
    npm install
    ```
 
 2. **Set up environment variables**:
    Create a `.env` file in the root directory and add the following keys:
+
    ```env
    DATABASE_URL="your-neon-postgres-url"
    BETTER_AUTH_SECRET="your-auth-secret"
@@ -38,11 +40,13 @@ endpnt is a beautiful, developer-first link-in-bio application. It consolidates 
    ```
 
 3. **Initialize the database**:
+
    ```bash
    npm run db:push
    ```
 
 4. **Run the development server**:
+
    ```bash
    npm run dev
    ```

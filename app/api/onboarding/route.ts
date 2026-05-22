@@ -1,72 +1,64 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { db } from "@/db/db";
-import { users } from "@/db/schema/schema";
-import { eq } from "drizzle-orm";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { db } from '@/db/db';
+import { users } from '@/db/schema/schema';
+import { eq } from 'drizzle-orm';
 
 const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
 
 export async function POST(request: NextRequest) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	const session = await auth.api.getSession({ headers: request.headers });
+	if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json();
-  const { username } = body;
+	const body = await request.json();
+	const { username } = body;
 
-  if (!username || !USERNAME_REGEX.test(username)) {
-    return NextResponse.json(
-      { error: "Invalid username. Use 3–20 lowercase letters, numbers, or underscores." },
-      { status: 400 }
-    );
-  }
+	if (!username || !USERNAME_REGEX.test(username)) {
+		return NextResponse.json(
+			{ error: 'Invalid username. Use 3–20 lowercase letters, numbers, or underscores.' },
+			{ status: 400 }
+		);
+	}
 
-  // Check if taken
-  const [existing] = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username))
-    .limit(1);
+	// Check if taken
+	const [existing] = await db.select().from(users).where(eq(users.username, username)).limit(1);
 
-  if (existing) {
-    return NextResponse.json({ error: "Username is already taken" }, { status: 409 });
-  }
+	if (existing) {
+		return NextResponse.json({ error: 'Username is already taken' }, { status: 409 });
+	}
 
-  // Check if user already has our record
-  const [self] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, session.user.id))
-    .limit(1);
+	// Check if user already has our record
+	const [self] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
 
-  if (self) {
-    // Update existing
-    const [updated] = await db
-      .update(users)
-      .set({ username })
-      .where(eq(users.id, session.user.id))
-      .returning();
-      
-    if (updated?.username) {
-      const { revalidatePath } = require("next/cache");
-      revalidatePath(`/${updated.username}`);
-    }
-    return NextResponse.json(updated);
-  }
+	if (self) {
+		// Update existing
+		const [updated] = await db
+			.update(users)
+			.set({ username })
+			.where(eq(users.id, session.user.id))
+			.returning();
 
-  // Create new user profile row
-  const [created] = await db
-    .insert(users)
-    .values({
-      id: session.user.id,
-      username,
-      avatarUrl: session.user.image ?? null,
-    })
-    .returning();
+		if (updated?.username) {
+			const { revalidatePath } = require('next/cache');
+			revalidatePath(`/${updated.username}`);
+		}
+		return NextResponse.json(updated);
+	}
 
-  if (created?.username) {
-    const { revalidatePath } = require("next/cache");
-    revalidatePath(`/${created.username}`);
-  }
+	// Create new user profile row
+	const [created] = await db
+		.insert(users)
+		.values({
+			id: session.user.id,
+			username,
+			avatarUrl: session.user.image ?? null,
+		})
+		.returning();
 
-  return NextResponse.json(created, { status: 201 });
+	if (created?.username) {
+		const { revalidatePath } = require('next/cache');
+		revalidatePath(`/${created.username}`);
+	}
+
+	return NextResponse.json(created, { status: 201 });
 }

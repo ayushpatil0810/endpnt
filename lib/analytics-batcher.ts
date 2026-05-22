@@ -1,131 +1,174 @@
-import { db } from "@/db/db";
-import { events, links, users } from "@/db/schema/schema";
-import { sql } from "drizzle-orm";
-import { after } from "next/server";
+/**
+ * Analytics tracking with Redis-backed counters.
+ *
+ * Architecture:
+ *   - View/click COUNTERS → Redis INCR (atomic, distributed, works across
+ *     all serverless invocations — no in-memory buffer needed)
+ *   - Event ROWS → Postgres INSERT via Next.js `after()` (non-blocking,
+ *     response is sent first, insert happens in background)
+ *
+ * Why this replaces the old in-memory buffer:
+ *   The previous `viewBuffer`/`clickBuffer` arrays were module-level state.
+ *   In serverless environments (Vercel), each function invocation starts
+ *   with a fresh module — the buffer is always empty, so BATCH_SIZE was
+ *   never reached. Every event flushed immediately as a single DB write.
+ *   Redis INCR is a single O(1) atomic operation that works correctly
+ *   across all invocations without any shared state.
+ */
+
+import { Redis } from '@upstash/redis';
+import { db } from '@/db/db';
+import { events } from '@/db/schema/schema';
+import { after } from 'next/server';
+
+// ── Redis client (gracefully absent in local dev without credentials) ────────
+
+let redis: Redis | null = null;
+
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+	redis = new Redis({
+		url: process.env.UPSTASH_REDIS_REST_URL,
+		token: process.env.UPSTASH_REDIS_REST_TOKEN,
+	});
+}
+
+// ── Redis key helpers ────────────────────────────────────────────────────────
+
+/** Atomic profile view counter: INCR endpnt:views:<userId> */
+const viewCountKey = (userId: string) => `endpnt:views:${userId}`;
+
+/** Atomic link click counter: INCR endpnt:clicks:<linkId> */
+const clickCountKey = (linkId: string) => `endpnt:clicks:${linkId}`;
+
+// ── Public API ────────────────────────────────────────────────────────────────
 
 interface ViewEvent {
-  userId: string;
-  username: string;
-  referrer: string | null;
+	userId: string;
+	username: string;
+	referrer: string | null;
 }
 
 interface ClickEvent {
-  userId: string;
-  linkId: string;
-  referrer: string | null;
-}
-
-const BATCH_SIZE = 5;
-const viewBuffer: ViewEvent[] = [];
-const clickBuffer: ClickEvent[] = [];
-
-/**
- * Tracks a profile view using in-memory batching.
- * Flushes to the database when BATCH_SIZE is reached,
- * or at the end of the request via Next.js `after()`.
- */
-export function trackProfileView(event: ViewEvent) {
-  viewBuffer.push(event);
-  
-  if (viewBuffer.length >= BATCH_SIZE) {
-    // Flush synchronously if we hit the limit
-    flushViews([...viewBuffer]).catch(console.error);
-    viewBuffer.length = 0;
-  } else {
-    // Ensure we flush at the end of the response cycle if under batch limit
-    after(() => {
-      if (viewBuffer.length > 0) {
-        flushViews([...viewBuffer]).catch(console.error);
-        viewBuffer.length = 0;
-      }
-    });
-  }
+	userId: string;
+	linkId: string;
+	referrer: string | null;
 }
 
 /**
- * Tracks a link click using in-memory batching.
- * Flushes to the database when BATCH_SIZE is reached,
- * or at the end of the request via Next.js `after()`.
+ * Tracks a profile view:
+ *   1. Atomically increments the Redis view counter for this user.
+ *   2. Schedules a Postgres `events` row insert via `after()` (post-response).
+ *
+ * If Redis is unavailable (local dev / missing env), falls back to a direct
+ * Postgres counter update inside `after()`.
  */
-export function trackLinkClick(event: ClickEvent) {
-  clickBuffer.push(event);
-  
-  if (clickBuffer.length >= BATCH_SIZE) {
-    flushClicks([...clickBuffer]).catch(console.error);
-    clickBuffer.length = 0;
-  } else {
-    after(() => {
-      if (clickBuffer.length > 0) {
-        flushClicks([...clickBuffer]).catch(console.error);
-        clickBuffer.length = 0;
-      }
-    });
-  }
+export function trackProfileView(event: ViewEvent): void {
+	if (redis) {
+		// Redis path: O(1) atomic counter increment — works across all invocations
+		redis.incr(viewCountKey(event.userId)).catch((err) => {
+			console.error('Redis view INCR failed:', err);
+		});
+	}
+
+	// Always insert the event row non-blocking after the response is sent
+	after(async () => {
+		try {
+			await db.insert(events).values({
+				userId: event.userId,
+				type: 'view',
+				referrer: event.referrer ? event.referrer.substring(0, 255) : null,
+			});
+
+			// Fallback: if Redis is absent, update the counter in Postgres too
+			if (!redis) {
+				const { users } = await import('@/db/schema/schema');
+				const { sql } = await import('drizzle-orm');
+				await db
+					.update(users)
+					.set({ views: sql`${users.views} + 1` })
+					.where(sql`${users.username} = ${event.username}`);
+			}
+		} catch (err) {
+			console.error('Failed to insert view event:', err);
+		}
+	});
 }
 
-async function flushViews(viewsToFlush: ViewEvent[]) {
-  if (viewsToFlush.length === 0) return;
+/**
+ * Tracks a link click:
+ *   1. Atomically increments the Redis click counter for this link.
+ *   2. Schedules a Postgres `events` row insert via `after()` (post-response).
+ *
+ * If Redis is unavailable, falls back to a direct Postgres counter update.
+ */
+export function trackLinkClick(event: ClickEvent): void {
+	if (redis) {
+		redis.incr(clickCountKey(event.linkId)).catch((err) => {
+			console.error('Redis click INCR failed:', err);
+		});
+	}
 
-  const usernames = Array.from(new Set(viewsToFlush.map((v) => v.username)));
-  const eventInserts = viewsToFlush.map((v) => ({
-    userId: v.userId,
-    type: "view" as const,
-    referrer: v.referrer ? v.referrer.substring(0, 255) : null,
-  }));
+	after(async () => {
+		try {
+			await db.insert(events).values({
+				userId: event.userId,
+				linkId: event.linkId,
+				type: 'click',
+				referrer: event.referrer ? event.referrer.substring(0, 255) : null,
+			});
 
-  try {
-    const promises = [];
-
-    // Batch update view counts
-    for (const username of usernames) {
-      const count = viewsToFlush.filter((v) => v.username === username).length;
-      promises.push(
-        db
-          .update(users)
-          .set({ views: sql`${users.views} + ${count}` })
-          .where(sql`${users.username} = ${username}`)
-      );
-    }
-
-    // Batch insert events
-    promises.push(db.insert(events).values(eventInserts));
-
-    await Promise.all(promises);
-  } catch (err) {
-    console.error("Failed to flush views batch:", err);
-  }
+			if (!redis) {
+				const { links } = await import('@/db/schema/schema');
+				const { sql, eq } = await import('drizzle-orm');
+				await db
+					.update(links)
+					.set({ clicks: sql`${links.clicks} + 1` })
+					.where(eq(links.id, event.linkId));
+			}
+		} catch (err) {
+			console.error('Failed to insert click event:', err);
+		}
+	});
 }
 
-async function flushClicks(clicksToFlush: ClickEvent[]) {
-  if (clicksToFlush.length === 0) return;
+// ── Counter flush helpers (for cron jobs / background sync) ─────────────────
 
-  const linkIds = Array.from(new Set(clicksToFlush.map((c) => c.linkId)));
-  const eventInserts = clicksToFlush.map((c) => ({
-    userId: c.userId,
-    linkId: c.linkId,
-    type: "click" as const,
-    referrer: c.referrer ? c.referrer.substring(0, 255) : null,
-  }));
+/**
+ * Reads and resets the Redis view counter for a user, then applies it to
+ * Postgres. Call this from a scheduled cron endpoint to sync Redis → Postgres.
+ *
+ * Uses GETDEL so the read+reset is atomic — no double-counting on retries.
+ */
+export async function flushViewCounter(userId: string): Promise<number> {
+	if (!redis) return 0;
+	const count = await redis.getdel(viewCountKey(userId));
+	if (!count || Number(count) === 0) return 0;
 
-  try {
-    const promises = [];
+	const { users } = await import('@/db/schema/schema');
+	const { sql } = await import('drizzle-orm');
+	await db
+		.update(users)
+		.set({ views: sql`${users.views} + ${Number(count)}` })
+		.where(sql`${users.id} = ${userId}`);
 
-    // Batch update click counts
-    for (const linkId of linkIds) {
-      const count = clicksToFlush.filter((c) => c.linkId === linkId).length;
-      promises.push(
-        db
-          .update(links)
-          .set({ clicks: sql`${links.clicks} + ${count}` })
-          .where(sql`${links.id} = ${linkId}`)
-      );
-    }
+	return Number(count);
+}
 
-    // Batch insert events
-    promises.push(db.insert(events).values(eventInserts));
+/**
+ * Reads and resets the Redis click counter for a link, then applies it to
+ * Postgres. Call this from a scheduled cron endpoint.
+ */
+export async function flushClickCounter(linkId: string): Promise<number> {
+	if (!redis) return 0;
+	const count = await redis.getdel(clickCountKey(linkId));
+	if (!count || Number(count) === 0) return 0;
 
-    await Promise.all(promises);
-  } catch (err) {
-    console.error("Failed to flush clicks batch:", err);
-  }
+	const { links } = await import('@/db/schema/schema');
+	const { sql, eq } = await import('drizzle-orm');
+	await db
+		.update(links)
+		.set({ clicks: sql`${links.clicks} + ${Number(count)}` })
+		.where(eq(links.id, linkId));
+
+	return Number(count);
 }

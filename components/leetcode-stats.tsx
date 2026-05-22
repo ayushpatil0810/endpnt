@@ -1,85 +1,91 @@
-const LEETCODE_COLOR = "#FFA116";
+const LEETCODE_COLOR = '#FFA116';
 
 const LeetCodeIcon = () => (
-  <svg
-    className="w-6 h-6"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    style={{ color: LEETCODE_COLOR }}
-  >
-    <path d="M16.102 17.93l-2.697 2.607c-.466.467-1.111.662-1.823.662s-1.357-.195-1.824-.662l-4.332-4.363c-.467-.467-.702-1.15-.702-1.863s.235-1.357.702-1.824l4.319-4.38c.467-.467 1.125-.645 1.837-.645s1.357.195 1.823.662l2.697 2.606c.514.515 1.365.497 1.9-.038.535-.536.553-1.387.039-1.901l-2.609-2.636a5.055 5.055 0 0 0-2.445-1.337l2.467-2.503c.513-.514.498-1.366-.037-1.901-.535-.535-1.387-.553-1.902-.038l-10.1 10.101c-.981.982-1.494 2.337-1.494 3.835 0 1.498.513 2.895 1.494 3.875l4.347 4.361c.981.979 2.337 1.452 3.834 1.452s2.853-.473 3.833-1.452l2.697-2.606c.514-.515.498-1.366-.037-1.901-.535-.535-1.387-.553-1.902-.038zM20.811 13.01H10.666c-.702 0-1.27.604-1.27 1.346s.568 1.346 1.27 1.346h10.145c.701 0 1.27-.604 1.27-1.346s-.569-1.346-1.27-1.346z" />
-  </svg>
+	<svg
+		className="w-6 h-6"
+		viewBox="0 0 24 24"
+		fill="currentColor"
+		style={{ color: LEETCODE_COLOR }}
+	>
+		<path d="M16.102 17.93l-2.697 2.607c-.466.467-1.111.662-1.823.662s-1.357-.195-1.824-.662l-4.332-4.363c-.467-.467-.702-1.15-.702-1.863s.235-1.357.702-1.824l4.319-4.38c.467-.467 1.125-.645 1.837-.645s1.357.195 1.823.662l2.697 2.606c.514.515 1.365.497 1.9-.038.535-.536.553-1.387.039-1.901l-2.609-2.636a5.055 5.055 0 0 0-2.445-1.337l2.467-2.503c.513-.514.498-1.366-.037-1.901-.535-.535-1.387-.553-1.902-.038l-10.1 10.101c-.981.982-1.494 2.337-1.494 3.835 0 1.498.513 2.895 1.494 3.875l4.347 4.361c.981.979 2.337 1.452 3.834 1.452s2.853-.473 3.833-1.452l2.697-2.606c.514-.515.498-1.366-.037-1.901-.535-.535-1.387-.553-1.902-.038zM20.811 13.01H10.666c-.702 0-1.27.604-1.27 1.346s.568 1.346 1.27 1.346h10.145c.701 0 1.27-.604 1.27-1.346s-.569-1.346-1.27-1.346z" />
+	</svg>
 );
 
-const formatNumber = (num: number) => 
-  Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num || 0);
+const formatNumber = (num: number) =>
+	Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(num || 0);
 
 export async function LeetcodeStats({ username }: { username: string }) {
-  if (!username) return null;
+	if (!username) return null;
 
-  let data;
-  try {
-    const res = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${username}/solved`,
-      { next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return null;
-    data = await res.json();
+	let data;
+	try {
+		const res = await fetch(`https://alfa-leetcode-api.onrender.com/${username}/solved`, {
+			next: { revalidate: 3600 },
+		});
+		if (!res.ok) return null;
+		data = await res.json();
 
-    // API returns errors as { errors: [...] } for invalid users
-    if (data.errors) return null;
-  } catch {
-    return null;
-  }
+		// API returns errors as { errors: [...] } for invalid users
+		if (data.errors) return null;
+	} catch {
+		return null;
+	}
 
-  return (
-    <a
-      href={`https://leetcode.com/${username}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="w-full h-full p-6 flex flex-col gap-4 group hover:bg-[#FFA116]/5 transition-colors relative overflow-hidden"
-    >
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#FFA116]/10 blur-3xl rounded-full pointer-events-none" />
-      <div className="flex items-center gap-3 z-10">
-        <LeetCodeIcon />
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-inherit tracking-tight">
-            LeetCode
-          </span>
-          <span className="text-[10px] font-mono" style={{ color: "var(--theme-text-secondary)" }}>
-            @{username}
-          </span>
-        </div>
-      </div>
-      <div 
-        className="flex flex-col gap-3 mt-4 pt-4 border-t w-full z-10"
-        style={{ borderColor: "var(--theme-separator)" }}
-      >
-        <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
-            Solved
-          </span>
-          <span className="text-sm font-bold text-inherit">
-            {formatNumber(data.solvedProblem || 0)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
-            Easy
-          </span>
-          <span className="text-sm font-bold text-emerald-500">
-            {formatNumber(data.easySolved || 0)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between w-full">
-          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--theme-text-secondary)" }}>
-            Medium
-          </span>
-          <span className="text-sm font-bold text-amber-500">
-            {formatNumber(data.mediumSolved || 0)}
-          </span>
-        </div>
-      </div>
-    </a>
-  );
+	return (
+		<a
+			href={`https://leetcode.com/${username}`}
+			target="_blank"
+			rel="noopener noreferrer"
+			className="w-full h-full p-6 flex flex-col gap-4 group hover:bg-[#FFA116]/5 transition-colors relative overflow-hidden"
+		>
+			<div className="absolute -top-10 -right-10 w-32 h-32 bg-[#FFA116]/10 blur-3xl rounded-full pointer-events-none" />
+			<div className="flex items-center gap-3 z-10">
+				<LeetCodeIcon />
+				<div className="flex flex-col">
+					<span className="text-sm font-semibold text-inherit tracking-tight">LeetCode</span>
+					<span className="text-[10px] font-mono" style={{ color: 'var(--theme-text-secondary)' }}>
+						@{username}
+					</span>
+				</div>
+			</div>
+			<div
+				className="flex flex-col gap-3 mt-4 pt-4 border-t w-full z-10"
+				style={{ borderColor: 'var(--theme-separator)' }}
+			>
+				<div className="flex items-center justify-between w-full">
+					<span
+						className="text-[10px] uppercase tracking-widest"
+						style={{ color: 'var(--theme-text-secondary)' }}
+					>
+						Solved
+					</span>
+					<span className="text-sm font-bold text-inherit">
+						{formatNumber(data.solvedProblem || 0)}
+					</span>
+				</div>
+				<div className="flex items-center justify-between w-full">
+					<span
+						className="text-[10px] uppercase tracking-widest"
+						style={{ color: 'var(--theme-text-secondary)' }}
+					>
+						Easy
+					</span>
+					<span className="text-sm font-bold text-emerald-500">
+						{formatNumber(data.easySolved || 0)}
+					</span>
+				</div>
+				<div className="flex items-center justify-between w-full">
+					<span
+						className="text-[10px] uppercase tracking-widest"
+						style={{ color: 'var(--theme-text-secondary)' }}
+					>
+						Medium
+					</span>
+					<span className="text-sm font-bold text-amber-500">
+						{formatNumber(data.mediumSolved || 0)}
+					</span>
+				</div>
+			</div>
+		</a>
+	);
 }
