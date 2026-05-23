@@ -1,9 +1,7 @@
-// ─── Shared primitive ─────────────────────────────────────────────────────────
 function Bone({ className = '' }: { className?: string }) {
 	return <div className={`animate-pulse rounded-none bg-foreground/[0.07] ${className}`} />;
 }
 
-// ─── GitHub Stats skeleton ────────────────────────────────────────────────────
 export function GithubStatsSkeleton() {
 	return (
 		<div className="w-full p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4">
@@ -31,7 +29,6 @@ export function GithubStatsSkeleton() {
 	);
 }
 
-// ─── GitHub Calendar skeleton ─────────────────────────────────────────────────
 export function GithubCalendarSkeleton() {
 	return (
 		<div className="w-full p-5 sm:p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md">
@@ -55,7 +52,6 @@ export function GithubCalendarSkeleton() {
 	);
 }
 
-// ─── LeetCode Stats skeleton ──────────────────────────────────────────────────
 export function LeetcodeStatsSkeleton() {
 	return (
 		<div className="w-full p-6 rounded-none border border-border/40 bg-card/10 backdrop-blur-md flex flex-col gap-4 relative overflow-hidden">
@@ -85,7 +81,6 @@ export function LeetcodeStatsSkeleton() {
 	);
 }
 
-// ─── Featured Projects skeleton ─────────────────────────────────────────────────
 export function FeaturedProjectsSkeleton() {
 	return (
 		<div className="flex flex-col gap-4 w-full mb-8">
@@ -129,7 +124,6 @@ export function FeaturedProjectsSkeleton() {
 	);
 }
 
-// ─── Shared article card skeleton ─────────────────────────────────────────────
 function ArticleCardSkeleton() {
 	return (
 		<div className="flex flex-col gap-3 p-5 rounded-none border border-border/30 bg-foreground/[0.03] backdrop-blur-md">
@@ -151,7 +145,6 @@ function ArticleCardSkeleton() {
 	);
 }
 
-// ─── Dev.to Posts skeleton ─────────────────────────────────────────────────────
 export function DevtoPostsSkeleton() {
 	return (
 		<div className="flex flex-col gap-4 w-full mb-8">
@@ -170,7 +163,6 @@ export function DevtoPostsSkeleton() {
 	);
 }
 
-// ─── Blog Posts skeleton (Medium / Hashnode) ──────────────────────────────────
 export function BlogPostsSkeleton() {
 	return (
 		<div className="flex flex-col gap-4 w-full mb-8">

@@ -19,7 +19,7 @@ export function ThemeStyleInjector({ theme }: ThemeStyleInjectorProps) {
 		.map(([key, value]) => `  ${key}: ${value};`)
 		.join('\n');
 
-	const css = `[data-theme="${theme.id}"] {\n${vars}\n}`;
+	const css = `[data-theme="${theme.id}"] {\n${vars}\n}\n${theme.customCss || ''}`;
 
 	return (
 		<style

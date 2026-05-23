@@ -4,6 +4,8 @@ import { db } from '@/db/db';
 import { projects } from '@/db/schema/schema';
 import { eq, asc } from 'drizzle-orm';
 import { CreateProjectSchema } from '@/lib/validators';
+import { revalidatePath } from 'next/cache';
+import { users } from '@/db/schema/schema';
 
 export async function GET(request: NextRequest) {
 	const session = await auth.api.getSession({ headers: request.headers });
@@ -33,7 +35,6 @@ export async function POST(request: NextRequest) {
 
 	const { title, description, liveUrl, githubUrl, techStack } = parsed.data;
 
-	// Get current max display_order
 	const existing = await db
 		.select()
 		.from(projects)
@@ -55,14 +56,12 @@ export async function POST(request: NextRequest) {
 		})
 		.returning();
 
-	const { users } = require('@/db/schema/schema');
 	const [user] = await db
 		.select({ username: users.username })
 		.from(users)
 		.where(eq(users.id, session.user.id))
 		.limit(1);
 	if (user?.username) {
-		const { revalidatePath } = require('next/cache');
 		revalidatePath(`/${user.username}`);
 	}
 

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db } from '@/db/db';
-import { users } from '@/db/schema/schema';
 import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 
 const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
 
@@ -20,18 +20,15 @@ export async function POST(request: NextRequest) {
 		);
 	}
 
-	// Check if taken
 	const [existing] = await db.select().from(users).where(eq(users.username, username)).limit(1);
 
 	if (existing) {
 		return NextResponse.json({ error: 'Username is already taken' }, { status: 409 });
 	}
 
-	// Check if user already has our record
 	const [self] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
 
 	if (self) {
-		// Update existing
 		const [updated] = await db
 			.update(users)
 			.set({ username })
@@ -39,13 +36,11 @@ export async function POST(request: NextRequest) {
 			.returning();
 
 		if (updated?.username) {
-			const { revalidatePath } = require('next/cache');
 			revalidatePath(`/${updated.username}`);
 		}
 		return NextResponse.json(updated);
 	}
 
-	// Create new user profile row
 	const [created] = await db
 		.insert(users)
 		.values({
@@ -56,7 +51,6 @@ export async function POST(request: NextRequest) {
 		.returning();
 
 	if (created?.username) {
-		const { revalidatePath } = require('next/cache');
 		revalidatePath(`/${created.username}`);
 	}
 

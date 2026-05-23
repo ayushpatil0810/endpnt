@@ -20,13 +20,9 @@ import {
 } from '@/components/profile';
 import { ThemeStyleInjector } from '@/components/profile/theme-style-injector';
 
-// ── Types ──────────────────────────────────────────────────────────────────────
-
 interface ProfilePageProps {
 	params: Promise<{ username: string }>;
 }
-
-// ── Data layer ─────────────────────────────────────────────────────────────────
 
 /** Cached per-request so `generateMetadata` and the page don't double-fetch. */
 const getUserByUsername = cache(async (username: string) => {
@@ -34,11 +30,7 @@ const getUserByUsername = cache(async (username: string) => {
 	return user ?? null;
 });
 
-// ── ISR ────────────────────────────────────────────────────────────────────────
-
 export const revalidate = 60;
-
-// ── Metadata ───────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
 	const { username } = await params;
@@ -70,8 +62,6 @@ export async function generateMetadata({ params }: ProfilePageProps): Promise<Me
 		},
 	};
 }
-
-// ── Page ───────────────────────────────────────────────────────────────────────
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
 	const { username } = await params;

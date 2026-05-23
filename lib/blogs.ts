@@ -104,8 +104,6 @@ export async function fetchHashnodePosts(username: string): Promise<BlogPost[]> 
 	}
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 const MAX_DESCRIPTION_LENGTH = 200;
 
 function extractXml(xml: string, tag: string): string | undefined {

@@ -4,8 +4,6 @@ import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import {
-	DndContext,
-	closestCenter,
 	KeyboardSensor,
 	PointerSensor,
 	useSensor,
@@ -13,9 +11,7 @@ import {
 	DragEndEvent,
 } from '@dnd-kit/core';
 import {
-	SortableContext,
 	sortableKeyboardCoordinates,
-	verticalListSortingStrategy,
 	arrayMove,
 } from '@dnd-kit/sortable';
 import dynamic from 'next/dynamic';
@@ -26,7 +22,7 @@ const AnalyticsDashboard = dynamic(
 	{
 		ssr: false,
 		loading: () => (
-			<div className="w-full h-[400px] flex items-center justify-center border border-border/40 bg-card/10">
+			<div className="w-full h-100 flex items-center justify-center border border-border/40 bg-card/10">
 				<IconLoader2 className="animate-spin text-muted-foreground" />
 			</div>
 		),
@@ -62,8 +58,6 @@ import {
 import { useDashboardStore } from '@/lib/stores/dashboard-store-provider';
 import type { DashboardInitialData } from '@/lib/stores/dashboard-store';
 
-// ── Tab definitions ───────────────────────────────────────────────────────────
-
 type Tab = 'analytics' | 'links' | 'projects' | 'profile' | 'appearance' | 'seo';
 
 const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
@@ -74,8 +68,6 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 	{ id: 'appearance', label: 'Appearance', icon: IconPalette },
 	{ id: 'seo', label: 'SEO Settings', icon: IconSettings },
 ];
-
-// ── Component ────────────────────────────────────────────────────────────────
 
 /**
  * DashboardClient is now a thin orchestrator — all state lives in the
@@ -90,7 +82,6 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 	const router = useRouter();
 	const toggleBtnRef = useRef<HTMLButtonElement>(null);
 
-	// ── Store selectors ────────────────────────────────────────────────────────
 	const user = useDashboardStore((s) => s.user);
 	const links = useDashboardStore((s) => s.links);
 	const projects = useDashboardStore((s) => s.projects);
@@ -101,21 +92,18 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 	const isShareModalOpen = useDashboardStore((s) => s.isShareModalOpen);
 	const avatarUrl = authUser.image ?? user.avatarUrl ?? null;
 
-	// ── Store actions ──────────────────────────────────────────────────────────
 	const setLinks = useDashboardStore((s) => s.setLinks);
 	const setProjects = useDashboardStore((s) => s.setProjects);
 	const setActiveTab = useDashboardStore((s) => s.setActiveTab);
 	const setDashboardTheme = useDashboardStore((s) => s.setDashboardTheme);
 	const setShareModalOpen = useDashboardStore((s) => s.setShareModalOpen);
 
-	// ── Origin (SSR-safe: start with production default, update after mount) ──
 	const [origin, setOrigin] = useState('https://endpnt.dev');
 	useEffect(() => {
 		setOrigin(window.location.origin);
 	}, []);
 	const profileUrl = `${origin}/${user.username}`;
 
-	// ── Keyboard shortcut (Cmd+K → add link) ──────────────────────────────────
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -128,7 +116,6 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, [setActiveTab]);
 
-	// ── Theme toggle with View Transition ─────────────────────────────────────
 	const handleThemeToggle = useCallback(() => {
 		const btn = toggleBtnRef.current;
 		const isGoingLight = dashboardTheme === 'dark';
@@ -164,7 +151,6 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 		});
 	}, [dashboardTheme, setDashboardTheme]);
 
-	// ── DnD sensors ───────────────────────────────────────────────────────────
 	const sensors = useSensors(
 		useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
 		useSensor(KeyboardSensor, {
@@ -172,7 +158,6 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 		})
 	);
 
-	// ── DnD handlers ──────────────────────────────────────────────────────────
 	async function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event;
 		if (!over || active.id === over.id) return;
@@ -232,12 +217,10 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 		router.push('/');
 	}, [router]);
 
-	// ── Derived analytics ─────────────────────────────────────────────────────
 	const totalViews = user.views ?? 0;
 	const totalClicks = links.reduce((sum, link) => sum + (link.clicks ?? 0), 0);
 	const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : '0.0';
 
-	// ── Render ─────────────────────────────────────────────────────────────────
 	return (
 		<div
 			data-dashboard-theme={dashboardTheme}
@@ -305,7 +288,7 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 			</nav>
 
 			{/* Main Workspace */}
-			<main className="flex-1 w-full max-w-[1600px] mx-auto flex overflow-hidden h-[calc(100vh-56px)]">
+			<main className="flex-1 w-full max-w-400 mx-auto flex overflow-hidden h-[calc(100vh-56px)]">
 				{/* Left Sidebar Navigation */}
 				<aside className="w-64 border-r border-border/40 bg-background flex-col pt-6 pb-6 overflow-y-auto hidden md:flex shrink-0">
 					<div className="px-6 pb-6 mb-2 border-b border-border/20">

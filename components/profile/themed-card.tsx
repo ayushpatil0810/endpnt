@@ -18,7 +18,7 @@ interface ThemedCardProps {
 export function ThemedCard({ theme: _theme, className, children }: ThemedCardProps) {
 	return (
 		<div
-			className={cn('transition-all duration-300', className)}
+			className={cn('theme-card transition-all duration-300', className)}
 			style={{
 				background: 'var(--theme-card-bg)',
 				border: 'var(--theme-card-border)',

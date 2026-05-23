@@ -9,7 +9,7 @@ export default function ProfileNotFound() {
 			</div>
 			<h2 className="text-3xl font-bold tracking-tight mb-2">Profile Not Found</h2>
 			<p className="text-muted-foreground max-w-sm mb-8 font-mono text-sm">
-				The user profile you are looking for doesn't exist or has been removed.
+				The user profile you are looking for doesn&apos;t exist or has been removed.
 			</p>
 			<Link
 				href="/"

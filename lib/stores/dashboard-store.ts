@@ -14,8 +14,6 @@ import type { User, Link as DbLink, Project } from '@/db/schema/schema';
 import type { ThemeId } from '@/lib/themes';
 import type { LayoutId } from '@/lib/layouts';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export type DashboardTheme = 'dark' | 'light';
 export type Tab = 'analytics' | 'links' | 'projects' | 'profile' | 'appearance' | 'seo';
 
@@ -28,14 +26,12 @@ export interface DashboardInitialData {
 }
 
 export interface DashboardState {
-	// ── Server data ──────────────────────────────────────────────────────────
 	user: User;
 	links: DbLink[];
 	projects: Project[];
 	initialEvents: { type: string; createdAt: Date }[];
 	authUser: { name: string; image: string | null };
 
-	// ── Editable profile fields ──────────────────────────────────────────────
 	bio: string;
 	githubUsername: string;
 	leetcodeUsername: string;
@@ -45,28 +41,23 @@ export interface DashboardState {
 	seoTitle: string;
 	seoDescription: string;
 
-	// ── Appearance (current selection + live-preview state) ──────────────────
 	theme: ThemeId | string;
 	layout: LayoutId | string;
 
-	// ── UI state ─────────────────────────────────────────────────────────────
 	activeTab: Tab;
 	dashboardTheme: DashboardTheme;
 	isShareModalOpen: boolean;
 
-	// ── Link actions ─────────────────────────────────────────────────────────
 	addLink: (link: DbLink) => void;
 	updateLink: (link: DbLink) => void;
 	deleteLink: (id: string) => void;
 	setLinks: (links: DbLink[]) => void;
 
-	// ── Project actions ──────────────────────────────────────────────────────
 	addProject: (project: Project) => void;
 	updateProject: (project: Project) => void;
 	deleteProject: (id: string) => void;
 	setProjects: (projects: Project[]) => void;
 
-	// ── Profile field setters ────────────────────────────────────────────────
 	setBio: (bio: string) => void;
 	setGithubUsername: (val: string) => void;
 	setLeetcodeUsername: (val: string) => void;
@@ -76,17 +67,13 @@ export interface DashboardState {
 	setSeoTitle: (val: string) => void;
 	setSeoDescription: (val: string) => void;
 
-	// ── Appearance setters ───────────────────────────────────────────────────
 	setTheme: (theme: ThemeId) => void;
 	setLayout: (layout: LayoutId) => void;
 
-	// ── UI setters ───────────────────────────────────────────────────────────
 	setActiveTab: (tab: Tab) => void;
 	setDashboardTheme: (theme: DashboardTheme) => void;
 	setShareModalOpen: (open: boolean) => void;
 }
-
-// ── Store factory ─────────────────────────────────────────────────────────────
 
 export type DashboardStore = ReturnType<typeof createDashboardStore>;
 
@@ -118,7 +105,6 @@ export function createDashboardStore(init: DashboardInitialData) {
 		dashboardTheme: 'dark',
 		isShareModalOpen: false,
 
-		// ── Link actions ────────────────────────────────────────────────────────
 		addLink: (link) => set((state) => ({ links: [...state.links, link] })),
 		updateLink: (updated) =>
 			set((state) => ({
@@ -127,7 +113,6 @@ export function createDashboardStore(init: DashboardInitialData) {
 		deleteLink: (id) => set((state) => ({ links: state.links.filter((l) => l.id !== id) })),
 		setLinks: (links) => set({ links }),
 
-		// ── Project actions ─────────────────────────────────────────────────────
 		addProject: (project) => set((state) => ({ projects: [...state.projects, project] })),
 		updateProject: (updated) =>
 			set((state) => ({
@@ -137,7 +122,6 @@ export function createDashboardStore(init: DashboardInitialData) {
 			set((state) => ({ projects: state.projects.filter((p) => p.id !== id) })),
 		setProjects: (projects) => set({ projects }),
 
-		// ── Profile field setters ────────────────────────────────────────────────
 		setBio: (bio) => set({ bio }),
 		setGithubUsername: (githubUsername) => set({ githubUsername }),
 		setLeetcodeUsername: (leetcodeUsername) => set({ leetcodeUsername }),
@@ -147,11 +131,9 @@ export function createDashboardStore(init: DashboardInitialData) {
 		setSeoTitle: (seoTitle) => set({ seoTitle }),
 		setSeoDescription: (seoDescription) => set({ seoDescription }),
 
-		// ── Appearance setters ───────────────────────────────────────────────────
 		setTheme: (theme) => set({ theme }),
 		setLayout: (layout) => set({ layout }),
 
-		// ── UI setters ───────────────────────────────────────────────────────────
 		setActiveTab: (activeTab) => set({ activeTab }),
 		setDashboardTheme: (dashboardTheme) => set({ dashboardTheme }),
 		setShareModalOpen: (isShareModalOpen) => set({ isShareModalOpen }),

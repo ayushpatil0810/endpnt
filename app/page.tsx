@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { signIn, useSession } from '@/lib/auth-client';
 import {
 	IconArrowRight,
@@ -19,30 +20,30 @@ import { motion } from 'motion/react';
 import { NeoButton } from '@/components/ui/neo-button';
 
 const socialProof = [
-	{ icon: IconBrandGithub, label: 'Syncs with GitHub' },
-	{ icon: IconBolt, label: 'Live LeetCode stats' },
-	{ icon: IconFlame, label: 'Setup in 2 minutes' },
+	{ icon: IconBrandGithub, label: 'Seamless GitHub Sync' },
+	{ icon: IconBolt, label: 'Instant Analytics' },
+	{ icon: IconFlame, label: 'Developer-First Design' },
 ];
 
-const trustIndicators = ['Free for individuals', 'GitHub sign-in', 'No credit card required'];
+const trustIndicators = ['Free for developers', 'Secure OAuth access', 'SEO optimized profiles'];
 
 const stats = [
 	{
 		icon: IconClockHour4,
-		value: '2 min',
-		label: 'average setup',
+		value: '24/7',
+		label: 'automated profile syncing',
 		accent: 'bg-[#ffde7a]',
 	},
 	{
 		icon: IconBolt,
 		value: 'Zero',
-		label: 'manual updates needed',
+		label: 'maintenance required',
 		accent: 'bg-[#9af6e8]',
 	},
 	{
 		icon: IconLock,
 		value: '100%',
-		label: 'privacy-friendly analytics',
+		label: 'data transparency',
 		accent: 'bg-[#ffb5cf]',
 	},
 ];
@@ -50,18 +51,18 @@ const stats = [
 const features = [
 	{
 		icon: IconLink,
-		title: 'Your footprint, consolidated.',
-		copy: 'Bring your GitHub, LinkedIn, Twitter/X, and personal projects into a single, beautifully designed interface.',
+		title: 'Aggregate your tech footprint.',
+		copy: 'Connect your GitHub, LeetCode, Hashnode, Dev.to, and Medium accounts to automatically display your coding activity and technical writing.',
 	},
 	{
 		icon: IconChartBar,
-		title: 'Know exactly who is clicking.',
-		copy: 'Track page views, click-through rates (CTR), and traffic sources with our privacy-friendly analytics dashboard.',
+		title: 'Measure your impact.',
+		copy: 'Gain deep insights into your audience with built-in event tracking. Monitor page views, link clicks, and referral sources in real-time.',
 	},
 	{
 		icon: IconPalette,
-		title: 'Make it yours (without CSS).',
-		copy: 'Choose from premium, developer-centric themes including terminal, cyberpunk, minimalist, and sleek dark modes.',
+		title: 'Customizable aesthetics.',
+		copy: 'Select from distinct layouts like sidebar or premium themes such as glassmorphism to reflect your personal brand perfectly.',
 	},
 ];
 
@@ -104,9 +105,13 @@ export default function LandingPage() {
 					className="flex cursor-pointer items-center gap-2 rounded-full focus-visible:outline focus-visible:outline-offset-4 focus-visible:outline-[#11d7d1]"
 					aria-label="Scroll to top"
 				>
-					<span className="flex size-9 items-center justify-center rounded-xl border-[3px] border-[#10172b] bg-[#ff6f31] font-black shadow-[3px_3px_0_#10172b]">
-						e
-					</span>
+					<Image
+						src="/logo.png"
+						alt="endpnt logo"
+						width={36}
+						height={36}
+						className="h-9 w-auto rounded-lg object-contain shadow-sm"
+					/>
 					<span className="text-lg font-black tracking-tight">endpnt.</span>
 				</button>
 
@@ -115,18 +120,18 @@ export default function LandingPage() {
 						className="rounded-full px-3 py-2 transition-colors hover:bg-[#e9e5d8]"
 						href="#features"
 					>
-						Features
+						Capabilities
 					</a>
 					<a className="rounded-full px-3 py-2 transition-colors hover:bg-[#e9e5d8]" href="#proof">
-						Metrics
+						Platform
 					</a>
 					<a className="rounded-full px-3 py-2 transition-colors hover:bg-[#e9e5d8]" href="#launch">
-						Why ENDPNT
+						The Vision
 					</a>
 				</div>
 
 				<NeoButton onClick={handleCTA} disabled={isPending} size="sm" variant="primary">
-					{session ? 'Dashboard' : 'Claim Your URL'}
+					{session ? 'Go to Hub' : 'Start Building'}
 					<IconArrowRight
 						data-icon="inline-end"
 						className="transition-transform group-hover:translate-x-0.5"
@@ -158,7 +163,7 @@ export default function LandingPage() {
 				>
 					<div className="mb-4 flex items-center justify-between">
 						<span className="rounded-full bg-[#ffde7a] px-3 py-1 text-xs font-black">
-							Live Commits
+							Recent Activity
 						</span>
 						<IconBrandGithub className="text-[#10172b]" />
 					</div>
@@ -184,11 +189,11 @@ export default function LandingPage() {
 							<IconSparkles />
 						</span>
 						<div>
-							<p className="text-sm font-black">Launch checklist</p>
-							<p className="text-xs font-bold opacity-70">3 of 3 complete</p>
+							<p className="text-sm font-black">Onboarding steps</p>
+							<p className="text-xs font-bold opacity-70">Completed</p>
 						</div>
 					</div>
-					{['Claim endpoint', 'Connect stack', 'Share & track'].map((item) => (
+					{['Define tech stack', 'Link repositories', 'Publish profile'].map((item) => (
 						<div
 							key={item}
 							className="mt-2 flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2 font-bold"
@@ -208,10 +213,10 @@ export default function LandingPage() {
 					<div className="pointer-events-none absolute -left-8 top-4 size-5 rotate-12 rounded-md border-[3px] border-[#10172b] bg-[#ffb5cf] shadow-[3px_3px_0_#10172b] sm:-left-14 sm:size-8" />
 					<div className="pointer-events-none absolute -right-6 bottom-8 size-7 rounded-full border-[3px] border-[#10172b] bg-[#9af6e8] shadow-[3px_3px_0_#10172b] sm:-right-12 sm:size-10" />
 					<h1 className="text-balance text-[clamp(2.6rem,8.6vw,7.2rem)] font-black leading-[0.9] tracking-tight uppercase">
-						One URL. <br />
-						Entire
+						Your code. <br />
+						Your
 						<span className="relative mx-3 inline-block -rotate-1 rounded-[1.4rem] border-4 border-[#10172b] bg-[#ff6f31] px-3 pb-2 pt-1 text-white shadow-[8px_8px_0_#10172b] normal-case">
-							identity.
+							canvas.
 						</span>
 					</h1>
 				</motion.div>
@@ -222,8 +227,8 @@ export default function LandingPage() {
 					transition={{ duration: 0.55, delay: 0.38 }}
 					className="mt-5 max-w-2xl text-balance text-base font-semibold leading-7 text-[#394057] sm:text-lg"
 				>
-					Stop juggling a Linktree, a stale portfolio, and your GitHub README. ENDPNT is the
-					ultimate hub for your projects, socials, and dev stats powered by deep link analytics.
+					Unify your developer identity. Create an SEO-optimized landing page that aggregates your
+					projects, technical articles, and coding statistics in one powerful interface.
 				</motion.p>
 
 				<motion.div
@@ -233,7 +238,7 @@ export default function LandingPage() {
 					className="mt-6 flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row"
 				>
 					<NeoButton onClick={handleCTA} disabled={isPending} size="lg" variant="primary">
-						{session ? 'Open dashboard' : 'Claim Your URL'}
+						{session ? 'Access Control Panel' : 'Initialize Profile'}
 						<IconRocket
 							data-icon="inline-end"
 							className="transition-transform group-hover:translate-x-0.5"
@@ -242,7 +247,7 @@ export default function LandingPage() {
 					{!session && (
 						<NeoButton onClick={handleCTA} disabled={isPending} size="lg" variant="secondary">
 							<IconBrandGithub data-icon="inline-start" />
-							Continue with GitHub
+							Authenticate with GitHub
 						</NeoButton>
 					)}
 				</motion.div>
@@ -301,15 +306,15 @@ export default function LandingPage() {
 					<div className="mb-12 flex flex-col items-start justify-between gap-5 md:flex-row md:items-end">
 						<div>
 							<span className="inline-flex rounded-full border-[3px] border-[#10172b] bg-[#ffb5cf] px-4 py-2 text-sm font-black shadow-[4px_4px_0_#10172b]">
-								Developer First
+								Engineered for scale
 							</span>
 							<h2 className="mt-6 max-w-2xl text-balance text-4xl font-black leading-none tracking-tight sm:text-6xl">
-								Show, don't just tell.
+								A centralized API for your presence.
 							</h2>
 						</div>
 						<p className="max-w-sm text-lg font-semibold leading-8 text-[#394057]">
-							Let your live coding metrics, stats, and repositories do the talking for you without
-							writing a single line of CSS.
+							Present your technical capabilities with dynamic integrations. Showcase your tech
+							stack and repository metrics flawlessly.
 						</p>
 					</div>
 
@@ -352,7 +357,7 @@ export default function LandingPage() {
 									<span className="size-3 rounded-full bg-[#11d7d1]" />
 								</div>
 								<span className="rounded-full border-[3px] border-[#10172b] bg-white px-3 py-1 text-xs font-black">
-									endpnt.dev/johndoe
+									endpnt.dev/developer
 								</span>
 							</div>
 
@@ -362,7 +367,7 @@ export default function LandingPage() {
 									<div className="h-4 w-32 rounded-full bg-[#10172b]" />
 									<div className="mt-3 h-3 w-44 max-w-full rounded-full bg-[#c8c6ba]" />
 									<div className="mt-6 flex flex-col gap-3">
-										{['Portfolio', 'GitHub', 'Resume'].map((item) => (
+										{['Projects', 'Tech Stack', 'Resume'].map((item) => (
 											<div
 												key={item}
 												className="rounded-xl border-[3px] border-[#10172b] bg-[#f5f3ea] px-3 py-2 text-sm font-black"
@@ -375,7 +380,7 @@ export default function LandingPage() {
 
 								<div className="rounded-[1.25rem] border-[3px] border-[#10172b] bg-[#11d7d1] p-4 shadow-[5px_5px_0_#10172b]">
 									<div className="flex items-center justify-between">
-										<p className="font-black">Live Stats</p>
+										<p className="font-black">Traffic Insights</p>
 										<IconChartBar />
 									</div>
 									<div className="mt-7 grid grid-cols-7 items-end gap-2">
@@ -388,8 +393,8 @@ export default function LandingPage() {
 										))}
 									</div>
 									<div className="mt-6 rounded-xl border-[3px] border-[#10172b] bg-white p-4">
-										<p className="text-sm font-black">Top Repo</p>
-										<p className="mt-1 text-3xl font-black tracking-tight">endpnt-web</p>
+										<p className="text-sm font-black">Most Viewed</p>
+										<p className="mt-1 text-3xl font-black tracking-tight">/projects</p>
 									</div>
 								</div>
 							</div>
@@ -398,18 +403,17 @@ export default function LandingPage() {
 
 					<div className="flex flex-col items-start gap-6">
 						<span className="rounded-full border-[3px] border-[#10172b] bg-[#ffde7a] px-4 py-2 text-sm font-black shadow-[4px_4px_0_#10172b]">
-							Built for developers who ship.
+							Designed for software engineers.
 						</span>
 						<h2 className="text-balance text-4xl font-black leading-none tracking-tight sm:text-6xl">
-							Why not just use Linktree or build a portfolio?
+							Stand out in the developer ecosystem.
 						</h2>
 						<p className="text-lg font-semibold leading-8 text-[#394057]">
-							Linktree doesn't understand code, and updating a custom portfolio every time you
-							launch takes too much time. Give your work the home it deserves with automatic syncing
-							and analytics.
+							A static page isn&apos;t enough to capture your technical growth. Build a dynamic portfolio
+							that evolves as you push code, write articles, and master new technologies.
 						</p>
 						<NeoButton onClick={handleCTA} disabled={isPending} size="lg" variant="accent">
-							{session ? 'Open dashboard' : 'Create Your Free Profile'}
+							{session ? 'Access Control Panel' : 'Launch Your Platform'}
 							<IconArrowRight
 								data-icon="inline-end"
 								className="transition-transform group-hover:translate-x-0.5"
@@ -421,7 +425,14 @@ export default function LandingPage() {
 
 			<footer className="relative z-10 border-t-4 border-[#10172b] bg-[#fffdf5] px-5 py-8 sm:px-8">
 				<div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-					<p className="text-xl font-black tracking-tight uppercase">endpnt.</p>
+					<div className="flex items-center gap-2">
+						<img
+							src="/logo.png"
+							alt="endpnt logo"
+							className="h-7 w-auto rounded-md object-contain"
+						/>
+						<p className="text-xl font-black tracking-tight uppercase">endpnt.</p>
+					</div>
 					<p className="text-sm font-bold text-[#394057]">
 						© {new Date().getFullYear()} endpnt. All rights reserved.
 					</p>

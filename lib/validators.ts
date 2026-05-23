@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
-
-// ── Links ──────────────────────────────────────────────────────────────────
+import { THEME_IDS } from './themes';
 
 export const CreateLinkSchema = z.object({
 	title: z.string().min(1, 'Title is required').max(100, 'Title must be 100 characters or fewer'),
@@ -14,8 +13,6 @@ export const UpdateLinkSchema = z.object({
 	display_order: z.number().int().min(0).optional(),
 });
 
-// ── Projects ───────────────────────────────────────────────────────────────
-
 export const CreateProjectSchema = z.object({
 	title: z.string().min(1, 'Title is required').max(100, 'Title must be 100 characters or fewer'),
 	description: z.string().max(500, 'Description must be 500 characters or fewer').optional(),
@@ -26,11 +23,9 @@ export const CreateProjectSchema = z.object({
 
 export const UpdateProjectSchema = CreateProjectSchema.partial();
 
-// ── Profile ────────────────────────────────────────────────────────────────
-
 export const UpdateProfileSchema = z.object({
 	bio: z.string().max(300, 'Bio must be 300 characters or fewer').optional(),
-	theme: z.enum(['glassmorphism', 'neo-brutalism', 'neumorphism', 'claymorphism']).optional(),
+	theme: z.enum(THEME_IDS).optional(),
 	layout: z.string().optional(),
 	githubUsername: z.string().max(39).optional(),
 	leetcodeUsername: z.string().max(100).optional(),
@@ -43,8 +38,6 @@ export const UpdateProfileSchema = z.object({
 		.max(160, 'SEO description should be 160 characters or fewer')
 		.optional(),
 });
-
-// ── Helper ──────────────────────────────────────────────────────────────────
 
 /**
  * Returns a 400 JSON response with Zod validation errors formatted as a

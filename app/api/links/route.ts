@@ -5,12 +5,12 @@ import { links, users } from '@/db/schema/schema';
 import { eq, asc } from 'drizzle-orm';
 import { isUrlSafe } from '@/lib/security';
 import { CreateLinkSchema } from '@/lib/validators';
+import { revalidatePath } from 'next/cache';
 
 export async function GET(request: NextRequest) {
 	const session = await auth.api.getSession({ headers: request.headers });
 	if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-	// Look up our custom users table by Better Auth user id
 	const userRow = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
 
 	if (!userRow.length) {
@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ error: 'Unsafe or blocked URL' }, { status: 400 });
 	}
 
-	// Get current max display_order
 	const existing = await db
 		.select()
 		.from(links)
@@ -71,7 +70,6 @@ export async function POST(request: NextRequest) {
 		.where(eq(users.id, session.user.id))
 		.limit(1);
 	if (user?.username) {
-		const { revalidatePath } = require('next/cache');
 		revalidatePath(`/${user.username}`);
 	}
 

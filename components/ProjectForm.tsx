@@ -5,13 +5,17 @@ import { IconLoader2, IconPlus, IconX } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import type { Project } from '@/db/schema/schema';
 import { isValidUrlString } from './LinkForm';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface ProjectFormProps {
 	onProjectAdded: (project: Project) => void;
 }
 
+const TITLE_CLASS =
+	'w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-4 text-xl sm:text-2xl font-medium tracking-tight text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case';
+
 const INPUT_CLASS =
-	'w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground/30 normal-case';
+	'w-full bg-card/20 border border-border/60 hover:border-foreground/40 rounded-none px-4 py-4 text-sm sm:text-base font-mono tracking-wide text-foreground focus:border-foreground focus:outline-none transition-colors placeholder:text-muted-foreground/30 normal-case';
 
 export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
 	const [open, setOpen] = useState(false);
@@ -70,111 +74,135 @@ export function ProjectForm({ onProjectAdded }: ProjectFormProps) {
 		}
 	}
 
-	if (!open) {
-		return (
-			<button
-				id="add-new-project-btn"
-				onClick={() => setOpen(true)}
-				className="w-full flex items-center justify-center gap-2 py-4 border border-dashed border-border/50 hover:border-foreground/40 rounded-none text-[10px] uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition-all"
-			>
-				<IconPlus size={14} />
-				Add Project
-			</button>
-		);
-	}
-
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className="flex flex-col gap-3 p-5 border border-border/50 rounded-none bg-card/10 backdrop-blur-sm"
-		>
-			<div className="flex items-center justify-between mb-1">
-				<span className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground">
-					New Project
-				</span>
+		<div className="w-full">
+			{!open ? (
 				<button
-					type="button"
-					onClick={reset}
-					className="text-muted-foreground hover:text-foreground transition-colors"
+					id="add-new-project-btn"
+					onClick={() => setOpen(true)}
+					className="w-full flex items-center justify-between px-6 py-6 border-y border-border/40 hover:border-foreground group transition-colors duration-300 bg-card/5 hover:bg-card/20"
 				>
-					<IconX size={14} />
-				</button>
-			</div>
-
-			<input
-				type="text"
-				value={title}
-				onChange={(e) => setTitle(e.target.value)}
-				placeholder="Project title *"
-				className={INPUT_CLASS}
-				autoFocus
-				required
-			/>
-
-			<textarea
-				value={description}
-				onChange={(e) => setDescription(e.target.value)}
-				placeholder="Short description (optional)"
-				rows={2}
-				className={`${INPUT_CLASS} resize-none`}
-			/>
-
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-				<div className="flex flex-col gap-1 w-full relative">
-					<input
-						type="text"
-						value={liveUrl}
-						onChange={(e) => setLiveUrl(e.target.value)}
-						placeholder="Live URL (optional)"
-						className={INPUT_CLASS}
-					/>
-					{!isLiveUrlValid && liveUrl.trim().length > 0 && (
-						<span className="text-[10px] text-destructive px-1 absolute -bottom-4">
-							Invalid URL
+					<div className="flex items-center gap-3">
+						<IconPlus
+							size={18}
+							className="text-muted-foreground group-hover:text-foreground transition-colors"
+						/>
+						<span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest">
+							Add new project
 						</span>
-					)}
-				</div>
-				<div className="flex flex-col gap-1 w-full relative">
-					<input
-						type="text"
-						value={githubUrl}
-						onChange={(e) => setGithubUrl(e.target.value)}
-						placeholder="GitHub URL (optional)"
-						className={INPUT_CLASS}
-					/>
-					{!isGithubUrlValid && githubUrl.trim().length > 0 && (
-						<span className="text-[10px] text-destructive px-1 absolute -bottom-4">
-							Invalid URL
-						</span>
-					)}
-				</div>
-			</div>
-
-			<input
-				type="text"
-				value={techInput}
-				onChange={(e) => setTechInput(e.target.value)}
-				placeholder="Tech stack, comma-separated (e.g. React, Go, Postgres)"
-				className={INPUT_CLASS}
-			/>
-
-			<div className="flex items-center gap-4 mt-3">
-				<button
-					type="submit"
-					disabled={saving || !isFormValid}
-					className="flex items-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-medium disabled:opacity-50 transition-colors"
-				>
-					{saving ? <IconLoader2 size={12} className="animate-spin" /> : <IconPlus size={12} />}
-					Add Project
+					</div>
 				</button>
-				<button
-					type="button"
-					onClick={reset}
-					className="flex items-center gap-2 px-6 py-2.5 rounded-none text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-transparent hover:border-border"
+			) : (
+				<motion.div
+					initial={{ opacity: 0, y: -10 }}
+					animate={{ opacity: 1, y: 0 }}
+					className="border border-border/80 p-4 sm:p-10 bg-card/10 relative mt-4 shadow-xl"
 				>
-					<IconX size={12} /> Cancel
-				</button>
-			</div>
-		</form>
+					<div className="flex items-center justify-between mb-8 pb-4 border-b border-border/40">
+						<h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+							Project Details
+						</h3>
+						<button
+							onClick={reset}
+							className="text-muted-foreground hover:text-foreground transition-colors bg-background p-2 rounded-full hover:bg-muted"
+						>
+							<IconX size={14} stroke={2} />
+						</button>
+					</div>
+
+					<AnimatePresence mode="wait">
+						<motion.form
+							key="form"
+							initial={{ opacity: 0, x: 10 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: 10 }}
+							onSubmit={handleSubmit}
+							className="flex flex-col gap-8"
+						>
+							<div className="flex flex-col gap-2 relative group">
+								<input
+									type="text"
+									value={title}
+									onChange={(e) => setTitle(e.target.value)}
+									placeholder="Project title *"
+									className={TITLE_CLASS}
+									autoFocus
+									required
+								/>
+							</div>
+
+							<div className="flex flex-col gap-2 relative group">
+								<textarea
+									value={description}
+									onChange={(e) => setDescription(e.target.value)}
+									placeholder="Short description (optional)"
+									rows={2}
+									className={`${INPUT_CLASS} resize-none`}
+								/>
+							</div>
+
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-4">
+								<div className="flex flex-col gap-2 relative group">
+									<input
+										type="text"
+										value={liveUrl}
+										onChange={(e) => setLiveUrl(e.target.value)}
+										placeholder="Live URL (optional)"
+										className={INPUT_CLASS}
+									/>
+									{!isLiveUrlValid && liveUrl.trim().length > 0 && (
+										<span className="text-[10px] text-destructive px-1 absolute -bottom-5">
+											Invalid URL
+										</span>
+									)}
+								</div>
+								<div className="flex flex-col gap-2 relative group">
+									<input
+										type="text"
+										value={githubUrl}
+										onChange={(e) => setGithubUrl(e.target.value)}
+										placeholder="GitHub URL (optional)"
+										className={INPUT_CLASS}
+									/>
+									{!isGithubUrlValid && githubUrl.trim().length > 0 && (
+										<span className="text-[10px] text-destructive px-1 absolute -bottom-5">
+											Invalid URL
+										</span>
+									)}
+								</div>
+							</div>
+
+							<div className="flex flex-col gap-2 relative group">
+								<input
+									type="text"
+									value={techInput}
+									onChange={(e) => setTechInput(e.target.value)}
+									placeholder="Tech stack, comma-separated (e.g. React, Go, Postgres)"
+									className={INPUT_CLASS}
+								/>
+							</div>
+
+							<div className="flex flex-col sm:flex-row gap-4 mt-2">
+								<button
+									type="submit"
+									disabled={saving || !isFormValid}
+									className="bg-foreground text-background px-8 py-4 rounded-none text-[10px] sm:text-xs uppercase tracking-widest font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
+								>
+									{saving ? <IconLoader2 size={16} className="animate-spin" /> : null}
+									{saving ? 'Adding...' : 'Add project'}
+								</button>
+								<button
+									type="button"
+									onClick={reset}
+									className="px-8 py-4 rounded-none text-[10px] sm:text-xs uppercase tracking-widest text-foreground hover:bg-muted transition-colors border border-border w-full sm:w-auto"
+								>
+									Cancel
+								</button>
+							</div>
+						</motion.form>
+					</AnimatePresence>
+				</motion.div>
+			)}
+		</div>
 	);
 }

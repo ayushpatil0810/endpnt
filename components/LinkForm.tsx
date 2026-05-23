@@ -21,7 +21,6 @@ const PRESETS = [
 	{ title: 'Telegram', url: 'https://t.me/' },
 	{ title: 'WhatsApp', url: 'https://wa.me/' },
 	{ title: 'Email', url: 'mailto:' },
-	{ title: 'Email', url: 'mailto:' },
 ];
 
 const URL_REGEX = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;

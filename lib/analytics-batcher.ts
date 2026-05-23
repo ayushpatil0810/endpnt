@@ -21,8 +21,6 @@ import { db } from '@/db/db';
 import { events } from '@/db/schema/schema';
 import { after } from 'next/server';
 
-// ── Redis client (gracefully absent in local dev without credentials) ────────
-
 let redis: Redis | null = null;
 
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
@@ -32,15 +30,11 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
 	});
 }
 
-// ── Redis key helpers ────────────────────────────────────────────────────────
-
 /** Atomic profile view counter: INCR endpnt:views:<userId> */
 const viewCountKey = (userId: string) => `endpnt:views:${userId}`;
 
 /** Atomic link click counter: INCR endpnt:clicks:<linkId> */
 const clickCountKey = (linkId: string) => `endpnt:clicks:${linkId}`;
-
-// ── Public API ────────────────────────────────────────────────────────────────
 
 interface ViewEvent {
 	userId: string;
@@ -130,8 +124,6 @@ export function trackLinkClick(event: ClickEvent): void {
 		}
 	});
 }
-
-// ── Counter flush helpers (for cron jobs / background sync) ─────────────────
 
 /**
  * Reads and resets the Redis view counter for a user, then applies it to

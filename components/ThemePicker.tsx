@@ -13,7 +13,7 @@ interface ThemePickerProps {
 
 const THEME_PREVIEW_STYLES: Record<string, React.CSSProperties> = {
 	glassmorphism: {
-		background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #0d1b2a 100%)',
+		background: '#000000',
 	},
 	'neo-brutalism': {
 		background: '#f5f0e8',
@@ -21,18 +21,24 @@ const THEME_PREVIEW_STYLES: Record<string, React.CSSProperties> = {
 	neumorphism: {
 		background: '#e0e5ec',
 	},
-	claymorphism: {
+	'retro-pop': {
 		background: 'linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #ede9fe 100%)',
+	},
+	claymorphism: {
+		background: '#f0f4f8',
+	},
+	terminal: {
+		background: '#000000',
 	},
 };
 
 const THEME_CARD_PREVIEWS: Record<string, React.CSSProperties> = {
 	glassmorphism: {
-		background: 'rgba(255,255,255,0.07)',
-		border: '1px solid rgba(255,255,255,0.15)',
-		borderRadius: '10px',
-		backdropFilter: 'blur(8px)',
-		boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+		background: 'rgba(255, 255, 255, 0.03)',
+		border: '1px solid rgba(255, 255, 255, 0.08)',
+		borderRadius: '20px',
+		backdropFilter: 'blur(16px)',
+		boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.12)',
 	},
 	'neo-brutalism': {
 		background: '#ffffff',
@@ -46,11 +52,24 @@ const THEME_CARD_PREVIEWS: Record<string, React.CSSProperties> = {
 		borderRadius: '10px',
 		boxShadow: '5px 5px 10px #b8bec7, -5px -5px 10px #ffffff',
 	},
-	claymorphism: {
+	'retro-pop': {
 		background: '#ffffff',
 		border: '2px solid rgba(255,255,255,0.9)',
 		borderRadius: '14px',
 		boxShadow: '0 5px 0px #d4b8e0, 0 8px 16px rgba(180,140,220,0.25)',
+	},
+	claymorphism: {
+		background: '#ffffff',
+		border: 'none',
+		borderRadius: '18px',
+		boxShadow:
+			'8px 8px 16px rgba(0, 0, 0, 0.04), -8px -8px 16px rgba(255, 255, 255, 0.8), inset 4px 4px 8px rgba(255, 255, 255, 0.8)',
+	},
+	terminal: {
+		background: '#050505',
+		border: '1px solid #00ff00',
+		borderRadius: '0px',
+		boxShadow: '0 0 10px rgba(0, 255, 0, 0.15)',
 	},
 };
 
@@ -58,14 +77,18 @@ const THEME_TEXT_COLORS: Record<string, string> = {
 	glassmorphism: 'rgba(255,255,255,0.9)',
 	'neo-brutalism': '#1a1a1a',
 	neumorphism: '#3a4a5e',
-	claymorphism: '#2d1b69',
+	'retro-pop': '#2d1b69',
+	claymorphism: '#334155',
+	terminal: '#00ff00',
 };
 
 const THEME_MUTED_COLORS: Record<string, string> = {
 	glassmorphism: 'rgba(255,255,255,0.45)',
 	'neo-brutalism': '#555555',
 	neumorphism: '#7a8a9e',
-	claymorphism: '#7c5cbf',
+	'retro-pop': '#7c5cbf',
+	claymorphism: '#64748b',
+	terminal: '#00aa00',
 };
 
 export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
